@@ -202,6 +202,7 @@ def listar_proyectos():
             COUNT(t.id_tarea) AS total_tareas,
             COUNT(t.id_tarea) FILTER (WHERE t.estado = 'completada') AS tareas_completadas,
             COUNT(t.id_tarea) FILTER (WHERE t.estado = 'bloqueada') AS tareas_bloqueadas,
+            COUNT(t.id_tarea) FILTER (WHERE t.fecha_vencimiento < CURRENT_TIMESTAMP AND t.estado != 'completada') AS tareas_vencidas,
             COALESCE(SUM(t.tiempo_real_horas * ut.costo_hora), 0) AS costo_consumido
         FROM proyecto p
         JOIN cliente c ON c.id_cliente = p.id_cliente
@@ -216,7 +217,23 @@ def listar_proyectos():
     proyectos = cur.fetchall()
 
     for p in proyectos:
-        p['es_riesgo'] = (p['costo_consumido'] > p['presupuesto_total']) or (p['tareas_bloqueadas'] > 0)
+        costo_excedido = p['costo_consumido'] > p['presupuesto_total']
+        pct_vencidas = (p['tareas_vencidas'] / p['total_tareas'] * 100) if p['total_tareas'] > 0 else 0
+        tiene_bloqueadas = p['tareas_bloqueadas'] > 0
+
+        # Mismo criterio que el dashboard
+        p['es_riesgo'] = costo_excedido or (pct_vencidas >= 50 and p['total_tareas'] > 0) or tiene_bloqueadas
+
+        # Motivos visibles en la tarjeta
+        motivos = []
+        if costo_excedido:
+            motivos.append(f"Presupuesto excedido (${float(p['costo_consumido']):.0f} / ${float(p['presupuesto_total']):.0f})")
+        if pct_vencidas >= 50 and p['total_tareas'] > 0:
+            motivos.append(f"{p['tareas_vencidas']} de {p['total_tareas']} tareas vencidas ({pct_vencidas:.0f}%)")
+        if tiene_bloqueadas:
+            motivos.append(f"{p['tareas_bloqueadas']} tarea(s) bloqueada(s)")
+        p['motivos_riesgo'] = motivos
+
         p['pct_presupuesto'] = round((float(p['costo_consumido']) / float(p['presupuesto_total']) * 100), 1) if p['presupuesto_total'] > 0 else 0
 
     cur.close()
@@ -328,7 +345,8 @@ def detalle_proyecto(id_proyecto):
             u.nombre AS nombre_asignado,
             u.rol AS rol_asignado,
             h.nombre_hito,
-            (SELECT COUNT(*) FROM dependencia_tarea WHERE id_tarea_dependiente = t.id_tarea) AS num_dependencias
+            (SELECT COUNT(*) FROM dependencia_tarea WHERE id_tarea_dependiente = t.id_tarea) AS num_dependencias,
+            (t.fecha_vencimiento < CURRENT_TIMESTAMP AND t.estado != 'completada') AS es_vencida
         FROM tarea t
         LEFT JOIN usuario u ON u.id_usuario = t.id_usuario_asignado
         LEFT JOIN hito h ON h.id_hito = t.id_hito
@@ -336,6 +354,25 @@ def detalle_proyecto(id_proyecto):
         ORDER BY t.prioridad DESC, t.fecha_vencimiento ASC
     """, (id_proyecto,))
     tareas = cur.fetchall()
+
+    total_tareas = len(tareas)
+    tareas_vencidas = sum(1 for t in tareas if t['es_vencida'])
+    tareas_bloqueadas = sum(1 for t in tareas if t['estado'] == 'bloqueada')
+
+    costo_excedido = costo_consumido > presupuesto
+    pct_vencidas = (tareas_vencidas / total_tareas * 100) if total_tareas > 0 else 0
+    tiene_bloqueadas = tareas_bloqueadas > 0
+
+    proyecto['es_riesgo'] = costo_excedido or (pct_vencidas >= 50 and total_tareas > 0) or tiene_bloqueadas
+
+    motivos = []
+    if costo_excedido:
+        motivos.append(f"Presupuesto excedido (${float(costo_consumido):.0f} / ${float(presupuesto):.0f})")
+    if pct_vencidas >= 50 and total_tareas > 0:
+        motivos.append(f"{tareas_vencidas} de {total_tareas} tareas vencidas ({pct_vencidas:.0f}%)")
+    if tiene_bloqueadas:
+        motivos.append(f"{tareas_bloqueadas} tarea(s) bloqueada(s)")
+    proyecto['motivos_riesgo'] = motivos
 
     cur.close()
     conn.close()
@@ -487,7 +524,8 @@ def listar_tareas():
             u.nombre AS nombre_asignado,
             u.rol AS rol_asignado,
             h.nombre_hito,
-            (SELECT COUNT(*) FROM dependencia_tarea WHERE id_tarea_dependiente = t.id_tarea) AS num_dependencias
+            (SELECT COUNT(*) FROM dependencia_tarea WHERE id_tarea_dependiente = t.id_tarea) AS num_dependencias,
+            (t.fecha_vencimiento < CURRENT_TIMESTAMP AND t.estado != 'completada') AS es_vencida
         FROM tarea t
         JOIN proyecto p ON p.id_proyecto = t.id_proyecto
         LEFT JOIN usuario u ON u.id_usuario = t.id_usuario_asignado

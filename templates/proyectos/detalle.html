@@ -30,6 +30,21 @@
   </div>
 </div>
 
+<!-- ══ ALERTAS Y RIESGOS ════════════════════════════════ -->
+{% if proyecto.es_riesgo %}
+<div class="alert alert-danger" style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+  <span style="font-size: 1.5rem;">⚠️</span>
+  <div>
+    <strong>Proyecto en Riesgo Operativo o Financiero</strong><br>
+    <span style="font-size: 0.9rem;">
+      {% for motivo in proyecto.motivos_riesgo %}
+        {{ motivo }}{% if not loop.last %} · {% endif %}
+      {% endfor %}
+    </span>
+  </div>
+</div>
+{% endif %}
+
 <!-- ══ RESUMEN FINANCIERO Y AVANCE ════════════════════════ -->
 <div class="kpi-grid">
   <!-- Presupuesto Total -->
@@ -188,6 +203,11 @@
                 <span class="dep-indicator" style="display: block; margin-top: 2px;">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
                   Tiene {{ t.num_dependencias }} dependencia(s)
+                </span>
+                {% endif %}
+                {% if t.es_vencida %}
+                <span style="display: block; margin-top: 4px; font-size: 0.75rem; color: var(--c-danger); font-weight: bold;">
+                  ⚠️ Vencida ({{ t.fecha_vencimiento.strftime('%d/%m/%Y') }})
                 </span>
                 {% endif %}
               </td>

@@ -84,8 +84,9 @@
     <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:6px 10px;font-size:.74rem;color:#b91c1c;display:flex;align-items:center;gap:6px;">
       <span style="font-size:1rem;">⚠️</span>
       <span>
-        {% if p.costo_consumido > p.presupuesto_total %}Presupuesto excedido (${{ "%.0f"|format(p.costo_consumido) }} / ${{ "%.0f"|format(p.presupuesto_total) }}){% endif %}
-        {% if p.tareas_bloqueadas > 0 %}{% if p.costo_consumido > p.presupuesto_total %} · {% endif %}{{ p.tareas_bloqueadas }} tarea(s) bloqueada(s){% endif %}
+        {% for motivo in p.motivos_riesgo %}
+          {{ motivo }}{% if not loop.last %} · {% endif %}
+        {% endfor %}
       </span>
     </div>
     {% endif %}

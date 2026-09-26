@@ -175,7 +175,13 @@
             {% endif %}
           </td>
           <td><span class="badge badge-{{ t.prioridad }}">{{ t.prioridad }}</span></td>
-          <td style="font-size: .8rem;">{{ t.fecha_vencimiento.strftime('%d/%m/%Y') if t.fecha_vencimiento else '—' }}</td>
+          <td style="font-size: .8rem;">
+            {% if t.es_vencida %}
+              <span style="color: var(--c-danger); font-weight: bold;">⚠️ {{ t.fecha_vencimiento.strftime('%d/%m/%Y') }}</span>
+            {% else %}
+              {{ t.fecha_vencimiento.strftime('%d/%m/%Y') if t.fecha_vencimiento else '—' }}
+            {% endif %}
+          </td>
           <td style="font-size: .78rem;">{{ t.tiempo_real_horas }}h / {{ t.tiempo_estimado_horas }}h</td>
           <td><span class="badge badge-{{ t.estado }}">{{ t.estado|replace('_',' ') }}</span></td>
           <td>
