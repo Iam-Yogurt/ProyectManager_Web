@@ -1,0 +1,104 @@
+{% extends 'layout.html' %}
+
+{% block title %}Equipo: {{ equipo.nombre_equipo }} - ProjectFlow ERP{% endblock %}
+{% block page_title %}{{ equipo.nombre_equipo }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+      <a href="{{ url_for('listar_equipos') }}" style="color: var(--c-text-3); font-size: .85rem;">Equipos</a>
+      <span style="color: var(--c-text-3);">/</span>
+      <span style="font-size: .85rem; color: var(--c-text-2); font-weight: 600;">Detalle</span>
+    </div>
+    <h1>👥 Equipo: {{ equipo.nombre_equipo }}</h1>
+    <p>{{ miembros|length }} miembro(s) asignado(s)</p>
+  </div>
+  <div class="btn-group">
+    <a href="{{ url_for('nuevo_usuario') }}" class="btn btn-primary btn-sm">➕ Añadir Usuario</a>
+    <a href="{{ url_for('editar_equipo', id_equipo=equipo.id_equipo) }}" class="btn btn-ghost btn-sm">✏️ Editar Equipo</a>
+  </div>
+</div>
+
+<div class="detail-layout">
+  <div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Miembros del Equipo</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Miembro</th>
+              <th>Rol</th>
+              <th>Habilidades</th>
+              <th>$/Hora</th>
+              <th>Carga</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in miembros %}
+            <tr>
+              <td>
+                <div class="avatar-row">
+                  <div class="avatar avatar-slate">{{ m.nombre[:2]|upper }}</div>
+                  <div>
+                    <div class="td-main">{{ m.nombre }}</div>
+                    <div style="font-size: .75rem; color: var(--c-text-3);">{{ m.email }}</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="badge-rol">{{ m.rol|replace('_',' ')|capitalize }}</span></td>
+              <td>
+                <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                  {% for h in m.habilidades %}
+                    {% if h %}<span class="badge-skill">{{ h }}</span>{% endif %}
+                  {% else %}
+                    <span style="color: var(--c-text-3); font-size: .75rem;">—</span>
+                  {% endfor %}
+                </div>
+              </td>
+              <td style="font-weight: 600;">${{ "%.2f"|format(m.costo_hora) }}/h</td>
+              <td>{{ m.horas_pendientes }}h ({{ m.tareas_activas }} tareas)</td>
+              <td>
+                <a href="{{ url_for('editar_usuario', id_usuario=m.id_usuario) }}" class="btn btn-ghost btn-sm">✏️</a>
+              </td>
+            </tr>
+            {% else %}
+            <tr class="empty-row"><td colspan="6">No hay miembros asignados a este equipo.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Detalles del Equipo</div>
+      </div>
+      <div class="card-body">
+        <div class="meta-list">
+          <div class="meta-item">
+            <span class="meta-key">ID</span>
+            <span class="meta-val">#{{ equipo.id_equipo }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Total Miembros</span>
+            <span class="meta-val">{{ miembros|length }}</span>
+          </div>
+        </div>
+        {% if equipo.descripcion %}
+        <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--c-border-l);">
+          <div class="detail-section-title">Descripción</div>
+          <p style="font-size: .85rem; color: var(--c-text-2); line-height: 1.6;">{{ equipo.descripcion }}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

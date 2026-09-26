@@ -1,0 +1,105 @@
+{% extends 'layout.html' %}
+
+{% block title %}{{ cliente.nombre_empresa }} - ProjectFlow ERP{% endblock %}
+{% block page_title %}{{ cliente.nombre_empresa }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+      <a href="{{ url_for('listar_clientes') }}" style="color: var(--c-text-3); font-size: .85rem;">Clientes</a>
+      <span style="color: var(--c-text-3);">/</span>
+      <span style="font-size: .85rem; color: var(--c-text-2); font-weight: 600;">Detalle</span>
+    </div>
+    <h1>🏢 {{ cliente.nombre_empresa }}</h1>
+    <p>{{ proyectos|length }} proyecto(s) contratados</p>
+  </div>
+  <div class="btn-group">
+    <a href="{{ url_for('editar_cliente', id_cliente=cliente.id_cliente) }}" class="btn btn-ghost btn-sm">✏️ Editar Cliente</a>
+    <a href="{{ url_for('nuevo_proyecto') }}" class="btn btn-primary btn-sm">➕ Nuevo Proyecto</a>
+  </div>
+</div>
+
+<div class="detail-layout">
+  <div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Proyectos Contratados por el Cliente</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Proyecto</th>
+              <th>Líder</th>
+              <th>Presupuesto</th>
+              <th>Estado</th>
+              <th>Avance</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in proyectos %}
+            <tr>
+              <td>
+                <a href="{{ url_for('detalle_proyecto', id_proyecto=p.id_proyecto) }}" class="td-main" style="color: var(--c-primary);">
+                  {{ p.nombre_proyecto }}
+                </a>
+              </td>
+              <td>{{ p.nombre_lider }}</td>
+              <td style="font-weight: 600;">${{ "%.2f"|format(p.presupuesto_total) }}</td>
+              <td><span class="badge badge-{{ p.estado }}">{{ p.estado|replace('_',' ') }}</span></td>
+              <td>
+                <div class="progress-wrap" style="min-width: 90px;">
+                  <div class="progress-bar-outer">
+                    <div class="progress-bar-inner" style="width: {{ p.avance }}%;"></div>
+                  </div>
+                  <span class="progress-label">{{ p.avance }}%</span>
+                </div>
+              </td>
+              <td>
+                <a href="{{ url_for('detalle_proyecto', id_proyecto=p.id_proyecto) }}" class="btn btn-ghost btn-sm">Ver</a>
+              </td>
+            </tr>
+            {% else %}
+            <tr class="empty-row"><td colspan="6">Este cliente no posee proyectos asignados todavía.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Ficha de Contacto</div>
+      </div>
+      <div class="card-body">
+        <div class="meta-list">
+          <div class="meta-item">
+            <span class="meta-key">ID</span>
+            <span class="meta-val">#{{ cliente.id_cliente }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Persona Contacto</span>
+            <span class="meta-val">{{ cliente.persona_contacto or '—' }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Correo Electrónico</span>
+            <span class="meta-val">
+              {% if cliente.email_contacto %}
+              <a href="mailto:{{ cliente.email_contacto }}" style="color: var(--c-primary);">{{ cliente.email_contacto }}</a>
+              {% else %}—{% endif %}
+            </span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Teléfono</span>
+            <span class="meta-val">{{ cliente.telefono or '—' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

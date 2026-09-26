@@ -1,0 +1,264 @@
+{% extends 'layout.html' %}
+
+{% block title %}{{ tarea.nombre_tarea }} - ProjectFlow ERP{% endblock %}
+{% block page_title %}{{ tarea.nombre_tarea }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+      <a href="{{ url_for('listar_tareas') }}" style="color: var(--c-text-3); font-size: .85rem;">Tareas</a>
+      <span style="color: var(--c-text-3);">/</span>
+      <a href="{{ url_for('detalle_proyecto', id_proyecto=tarea.id_proyecto) }}" style="color: var(--c-text-3); font-size: .85rem;">{{ tarea.nombre_proyecto }}</a>
+      <span style="color: var(--c-text-3);">/</span>
+      <span style="font-size: .85rem; color: var(--c-text-2); font-weight: 600;">Detalle</span>
+    </div>
+    <h1>{{ tarea.nombre_tarea }}</h1>
+    <p>
+      Proyecto: <a href="{{ url_for('detalle_proyecto', id_proyecto=tarea.id_proyecto) }}" style="color: var(--c-primary); font-weight: 600;">{{ tarea.nombre_proyecto }}</a>
+      {% if tarea.nombre_hito %} · Hito: <strong>🎯 {{ tarea.nombre_hito }}</strong>{% endif %}
+    </p>
+  </div>
+
+  <div class="btn-group">
+    <a href="{{ url_for('editar_tarea', id_tarea=tarea.id_tarea) }}" class="btn btn-ghost btn-sm">
+      ✏️ Editar Datos
+    </a>
+    <form action="{{ url_for('eliminar_tarea', id_tarea=tarea.id_tarea) }}" method="POST" style="display:inline;"
+          onsubmit="return confirm('¿Eliminar esta tarea definitivamente?');">
+      <button type="submit" class="btn btn-danger btn-sm">🗑️ Eliminar</button>
+    </form>
+  </div>
+</div>
+
+<div class="detail-layout">
+
+  <!-- Left: Detalles Principales, Comentarios & Audit Log -->
+  <div>
+
+    <!-- Descripción & Estado Rápido -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          Descripción de la Tarea
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <span class="badge badge-{{ tarea.prioridad }}">{{ tarea.prioridad }}</span>
+          <span class="badge badge-{{ tarea.estado }}">{{ tarea.estado|replace('_',' ') }}</span>
+        </div>
+      </div>
+      <div class="card-body">
+        {% if tarea.descripcion %}
+        <p style="font-size: .9rem; color: var(--c-text-2); line-height: 1.7; margin-bottom: 20px;">
+          {{ tarea.descripcion }}
+        </p>
+        {% else %}
+        <p style="color: var(--c-text-3); font-size: .85rem; font-style: italic; margin-bottom: 20px;">
+          Sin descripción detallada para esta tarea.
+        </p>
+        {% endif %}
+
+        {% if tarea.num_dependencias > 0 %}
+        <div class="risk-banner" style="margin-bottom: 16px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span>Esta tarea tiene {{ tarea.num_dependencias }} dependencia(s) previas requeridas antes de su culminación.</span>
+        </div>
+        {% endif %}
+
+        <!-- Formulario Rápido de Actualización de Estado y Horas -->
+        <div style="background: var(--c-bg); border: 1px solid var(--c-border); border-radius: var(--r-md); padding: 14px;">
+          <div style="font-size: .8rem; font-weight: 700; text-transform: uppercase; color: var(--c-text-3); margin-bottom: 10px;">
+            Actualización Rápida
+          </div>
+          <form action="{{ url_for('actualizar_tarea', id_tarea=tarea.id_tarea) }}" method="POST" class="form-grid">
+            <input type="hidden" name="nombre_tarea" value="{{ tarea.nombre_tarea }}">
+            <input type="hidden" name="id_proyecto" value="{{ tarea.id_proyecto }}">
+            <input type="hidden" name="id_hito" value="{{ tarea.id_hito or '' }}">
+            <input type="hidden" name="id_usuario_asignado" value="{{ tarea.id_usuario_asignado or '' }}">
+            <input type="hidden" name="fecha_vencimiento" value="{{ tarea.fecha_vencimiento.strftime('%Y-%m-%dT%H:%M') if tarea.fecha_vencimiento else '' }}">
+            <input type="hidden" name="prioridad" value="{{ tarea.prioridad }}">
+            <input type="hidden" name="tiempo_estimado_horas" value="{{ tarea.tiempo_estimado_horas }}">
+            <input type="hidden" name="descripcion" value="{{ tarea.descripcion or '' }}">
+
+            <div class="form-group">
+              <label class="form-label">Estado</label>
+              <select name="estado" class="form-select">
+                <option value="pendiente"   {% if tarea.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                <option value="en_progreso" {% if tarea.estado == 'en_progreso' %}selected{% endif %}>En Progreso</option>
+                <option value="bloqueada"   {% if tarea.estado == 'bloqueada' %}selected{% endif %}>Bloqueada</option>
+                <option value="completada"  {% if tarea.estado == 'completada' %}selected{% endif %}>Completada</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Horas Reales Trabajadas</label>
+              <input type="number" step="0.5" min="0" name="tiempo_real_horas" class="form-input" value="{{ tarea.tiempo_real_horas }}">
+            </div>
+
+            <div class="col-span-2" style="display: flex; justify-content: flex-end;">
+              <button type="submit" class="btn btn-primary btn-sm">Actualizar Estado y Horas</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SECCIÓN DE COMENTARIOS ══════════════════════════ -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Comentarios y Actividad ({{ comentarios|length }})
+        </div>
+      </div>
+      <div class="card-body">
+        {% if comentarios %}
+        <div class="comment-list">
+          {% for c in comentarios %}
+          <div class="comment-item">
+            <div class="avatar avatar-sm avatar-slate">
+              {{ c.nombre_usuario[:2]|upper }}
+            </div>
+            <div class="comment-body">
+              <div class="comment-header">
+                <span class="comment-author">{{ c.nombre_usuario }} <span style="font-weight: 400; color: var(--c-text-3); font-size: .75rem;">({{ c.rol_usuario }})</span></span>
+                <span class="comment-date">{{ c.fecha_hora.strftime('%d/%m/%Y %H:%M') }}</span>
+              </div>
+              <div class="comment-text">{{ c.contenido }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p style="color: var(--c-text-3); font-size: .85rem; text-align: center; padding: 14px 0;">
+          No hay comentarios en esta tarea todavía. Sé el primero en comentar.
+        </p>
+        {% endif %}
+
+        <!-- Formulario para Agregar Comentario -->
+        <form action="{{ url_for('agregar_comentario', id_tarea=tarea.id_tarea) }}" method="POST" style="margin-top: 16px;">
+          <div class="form-group" style="margin-bottom: 10px;">
+            <label class="form-label">Autor del Comentario</label>
+            <select name="id_usuario" class="form-select" style="max-width: 280px;">
+              {% for u in usuarios %}
+              <option value="{{ u.id_usuario }}">{{ u.nombre }} ({{ u.rol }})</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 10px;">
+            <textarea name="contenido" class="form-textarea" placeholder="Escribe una actualización o nota sobre esta tarea..." required></textarea>
+          </div>
+          <div style="display: flex; justify-content: flex-end;">
+            <button type="submit" class="btn btn-primary btn-sm">
+              💬 Publicar Comentario
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ══ AUDIT LOG / HISTORIAL DE CAMBIOS ════════════════ -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+          Registro de Auditoría (Historial de Cambios)
+        </div>
+      </div>
+      <div class="card-body">
+        {% if historial %}
+        <div>
+          {% for h in historial %}
+          <div class="audit-item">
+            <span class="audit-date">{{ h.fecha_cambio.strftime('%d/%m/%Y %H:%M') }}</span>
+            <span class="badge badge-{{ h.estado_anterior or 'pendiente' }}">{{ h.estado_anterior or 'inicial' }}</span>
+            <span>→</span>
+            <span class="badge badge-{{ h.estado_nuevo }}">{{ h.estado_nuevo }}</span>
+            {% if h.nombre_usuario %}
+            <span style="color: var(--c-text-3);">por <strong>{{ h.nombre_usuario }}</strong></span>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p style="color: var(--c-text-3); font-size: .85rem; text-align: center; padding: 14px 0;">
+          No hay registros de cambios de estado previos.
+        </p>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right: Metadatos y Esfuerzo -->
+  <div>
+    <!-- Metadatos de la Tarea -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Parámetros de Entrega</div>
+      </div>
+      <div class="card-body">
+        <div class="meta-list">
+          <div class="meta-item">
+            <span class="meta-key">ID Tarea</span>
+            <span class="meta-val">#{{ tarea.id_tarea }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Recurso Asignado</span>
+            <span class="meta-val">
+              {% if tarea.nombre_asignado %}
+              <div class="avatar-row" style="justify-content: flex-end;">
+                <div class="avatar avatar-sm avatar-slate">{{ tarea.nombre_asignado[:2]|upper }}</div>
+                <span>{{ tarea.nombre_asignado }}</span>
+              </div>
+              {% else %}
+              <span style="color: var(--c-text-3);">Sin asignar</span>
+              {% endif %}
+            </span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Prioridad</span>
+            <span class="meta-val"><span class="badge badge-{{ tarea.prioridad }}">{{ tarea.prioridad }}</span></span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Fecha Vencimiento</span>
+            <span class="meta-val">{{ tarea.fecha_vencimiento.strftime('%d/%m/%Y %H:%M') if tarea.fecha_vencimiento else '—' }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Fecha Creación</span>
+            <span class="meta-val">{{ tarea.fecha_creacion.strftime('%d/%m/%Y') if tarea.fecha_creacion else '—' }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Hito Vinculado</span>
+            <span class="meta-val">{{ tarea.nombre_hito or 'Ninguno' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Indicador de Esfuerzo (Horas Reales vs Estimadas) -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Control de Horas</div>
+      </div>
+      <div class="card-body">
+        {% set pct_horas = [(tarea.tiempo_real_horas / tarea.tiempo_estimado_horas * 100)|round(1), 100]|min if tarea.tiempo_estimado_horas > 0 else 0 %}
+        <div style="display: flex; justify-content: space-between; font-size: .8rem; margin-bottom: 6px;">
+          <span style="color: var(--c-text-3);">Esfuerzo Consumido</span>
+          <span style="font-weight: 700; color: var(--c-text);">{{ pct_horas }}%</span>
+        </div>
+        <div class="progress-bar-outer" style="height: 8px;">
+          <div class="progress-bar-inner {% if tarea.tiempo_real_horas > tarea.tiempo_estimado_horas %}danger{% else %}primary{% endif %}"
+               style="width: {{ pct_horas }}%;"></div>
+        </div>
+        <div style="font-size: .78rem; color: var(--c-text-3); margin-top: 8px;">
+          <strong>{{ tarea.tiempo_real_horas }}h</strong> reales registradas de <strong>{{ tarea.tiempo_estimado_horas }}h</strong> estimadas.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

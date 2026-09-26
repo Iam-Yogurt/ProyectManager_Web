@@ -1,0 +1,138 @@
+{% extends 'layout.html' %}
+
+{% block title %}Equipos y Recursos - ProjectFlow ERP{% endblock %}
+{% block page_title %}Equipos y Recursos{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <h1>Equipos y Recursos</h1>
+    <p>Directorio de talento, habilidades técnicas, asignación de equipos y costos por hora</p>
+  </div>
+  <div class="btn-group">
+    <a href="{{ url_for('nuevo_usuario') }}" class="btn btn-primary btn-sm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      Nuevo Usuario
+    </a>
+    <a href="{{ url_for('nuevo_equipo') }}" class="btn btn-ghost btn-sm">
+      ➕ Nuevo Equipo
+    </a>
+  </div>
+</div>
+
+<!-- ══ EQUIPOS CARDS ═════════════════════════════════════ -->
+<div class="card" style="margin-bottom: 24px;">
+  <div class="card-header">
+    <div class="card-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Departamentos y Escuadras ({{ equipos|length }})
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="stats-grid" style="margin-bottom: 0;">
+      {% for eq in equipos %}
+      <div class="stat-card" style="text-align: left; padding: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+          <a href="{{ url_for('detalle_equipo', id_equipo=eq.id_equipo) }}" style="font-weight: 700; color: var(--c-text); font-size: .95rem;">
+            {{ eq.nombre_equipo }}
+          </a>
+          <span class="badge badge-en_desarrollo">{{ eq.total_miembros }} miembros</span>
+        </div>
+        <p style="font-size: .78rem; color: var(--c-text-3); margin-bottom: 12px; line-height: 1.4;">
+          {{ eq.descripcion or 'Sin descripción asignada.' }}
+        </p>
+        <div style="display: flex; gap: 6px;">
+          <a href="{{ url_for('detalle_equipo', id_equipo=eq.id_equipo) }}" class="btn btn-ghost btn-sm" style="flex: 1; justify-content: center; font-size: .75rem; padding: 4px 8px;">
+            Ver Miembros
+          </a>
+          <a href="{{ url_for('editar_equipo', id_equipo=eq.id_equipo) }}" class="btn btn-ghost btn-sm" style="font-size: .75rem; padding: 4px 8px;">
+            ✏️
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- ══ DIRECTORIO DE USUARIOS Y HABILIDADES ═══════════════ -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Directorio de Recursos y Matriz de Habilidades ({{ usuarios|length }})
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Recurso</th>
+          <th>Rol</th>
+          <th>Equipo</th>
+          <th>Habilidades Técnicas</th>
+          <th>Tarifa / Hora</th>
+          <th>Carga Activa</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in usuarios %}
+        <tr>
+          <td>
+            <div class="avatar-row">
+              <div class="avatar avatar-slate">{{ u.nombre[:2]|upper }}</div>
+              <div>
+                <div class="td-main">{{ u.nombre }}</div>
+                <div style="font-size: .75rem; color: var(--c-text-3);">{{ u.email }}</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge-rol">{{ u.rol|replace('_',' ')|capitalize }}</span></td>
+          <td style="font-size: .85rem; color: var(--c-text-2);">{{ u.nombre_equipo or '— Sin equipo' }}</td>
+          <td>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px; max-width: 260px;">
+              {% for h in u.habilidades %}
+                {% if h %}
+                <span class="badge-skill">{{ h }}</span>
+                {% endif %}
+              {% else %}
+                <span style="color: var(--c-text-3); font-size: .75rem;">Sin skills registradas</span>
+              {% endfor %}
+            </div>
+          </td>
+          <td style="font-weight: 600; color: var(--c-text);">${{ "%.2f"|format(u.costo_hora) }}/h</td>
+          <td>
+            <div style="font-size: .8rem; font-weight: 600;">{{ u.horas_pendientes }}h</div>
+            <div style="font-size: .72rem; color: var(--c-text-3);">{{ u.tareas_activas }} tarea(s)</div>
+          </td>
+          <td>
+            {% if u.activo %}
+            <span style="display: inline-flex; align-items: center; gap: 5px; font-size: .78rem; color: var(--c-success); font-weight: 600;">
+              <span class="status-dot active"></span> Activo
+            </span>
+            {% else %}
+            <span style="display: inline-flex; align-items: center; gap: 5px; font-size: .78rem; color: var(--c-text-3);">
+              <span class="status-dot inactive"></span> Inactivo
+            </span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="btn-group">
+              <a href="{{ url_for('editar_usuario', id_usuario=u.id_usuario) }}" class="btn btn-ghost btn-sm" title="Editar">✏️</a>
+              <form action="{{ url_for('eliminar_usuario', id_usuario=u.id_usuario) }}" method="POST" style="display:inline;"
+                    onsubmit="return confirm('¿Eliminar este usuario?');">
+                <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">🗑️</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr class="empty-row"><td colspan="8">No hay usuarios registrados.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

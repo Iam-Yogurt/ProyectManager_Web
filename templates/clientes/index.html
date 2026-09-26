@@ -1,0 +1,67 @@
+{% extends 'layout.html' %}
+
+{% block title %}Clientes - ProjectFlow ERP{% endblock %}
+{% block page_title %}Clientes{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <h1>Gestión de Clientes</h1>
+    <p>Directorio de empresas, personas de contacto y volumen de proyectos contratados</p>
+  </div>
+  <a href="{{ url_for('nuevo_cliente') }}" class="btn btn-primary btn-sm">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+    Nuevo Cliente
+  </a>
+</div>
+
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Empresa</th>
+          <th>Persona de Contacto</th>
+          <th>Email</th>
+          <th>Teléfono</th>
+          <th>Proyectos Asociados</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in clientes %}
+        <tr>
+          <td>
+            <a href="{{ url_for('detalle_cliente', id_cliente=c.id_cliente) }}" class="td-main" style="color: var(--c-primary);">
+              {{ c.nombre_empresa }}
+            </a>
+          </td>
+          <td>{{ c.persona_contacto or '—' }}</td>
+          <td>
+            {% if c.email_contacto %}
+            <a href="mailto:{{ c.email_contacto }}" style="color: var(--c-primary); font-size: .85rem;">{{ c.email_contacto }}</a>
+            {% else %}—{% endif %}
+          </td>
+          <td style="font-size: .85rem;">{{ c.telefono or '—' }}</td>
+          <td>
+            <span class="badge badge-en_desarrollo">{{ c.total_proyectos }} proyecto(s)</span>
+          </td>
+          <td>
+            <div class="btn-group">
+              <a href="{{ url_for('detalle_cliente', id_cliente=c.id_cliente) }}" class="btn btn-ghost btn-sm">Ver</a>
+              <a href="{{ url_for('editar_cliente', id_cliente=c.id_cliente) }}" class="btn btn-ghost btn-sm">✏️</a>
+              <form action="{{ url_for('eliminar_cliente', id_cliente=c.id_cliente) }}" method="POST" style="display:inline;"
+                    onsubmit="return confirm('¿Eliminar este cliente? (Solo es posible si no posee proyectos registrados)');">
+                <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr class="empty-row"><td colspan="6">No hay clientes registrados en el sistema.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,246 @@
+{% extends 'layout.html' %}
+
+{% block title %}Tablero de Tareas - ProjectFlow ERP{% endblock %}
+{% block page_title %}Tablero de Tareas{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <h1>Tablero de Tareas</h1>
+    <p>Flujo Kanban interactivo y gestión ágil de actividades</p>
+  </div>
+  <div class="btn-group">
+    <!-- View Switcher -->
+    <div class="view-toggle">
+      <a href="{{ url_for('listar_tareas', vista='kanban', proyecto=filtro_proyecto, usuario=filtro_usuario) }}" class="{% if vista != 'lista' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="18" rx="1"/></svg>
+        Kanban
+      </a>
+      <a href="{{ url_for('listar_tareas', vista='lista', proyecto=filtro_proyecto, usuario=filtro_usuario) }}" class="{% if vista == 'lista' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        Lista
+      </a>
+    </div>
+
+    <a href="{{ url_for('nueva_tarea') }}" class="btn btn-primary btn-sm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      Nueva Tarea
+    </a>
+  </div>
+</div>
+
+<!-- ══ FILTRO BAR ════════════════════════════════════════ -->
+<div class="filter-bar">
+  <div class="filter-group">
+    <label class="form-label">Filtrar por Proyecto</label>
+    <select id="f_proyecto" class="form-select" onchange="aplicarFiltros()">
+      <option value="">Todos los proyectos</option>
+      {% for p in proyectos %}
+      <option value="{{ p.id_proyecto }}" {% if filtro_proyecto == p.id_proyecto|string %}selected{% endif %}>
+        {{ p.nombre_proyecto }}
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="filter-group">
+    <label class="form-label">Filtrar por Asignado</label>
+    <select id="f_usuario" class="form-select" onchange="aplicarFiltros()">
+      <option value="">Todos los usuarios</option>
+      {% for u in usuarios %}
+      <option value="{{ u.id_usuario }}" {% if filtro_usuario == u.id_usuario|string %}selected{% endif %}>
+        {{ u.nombre }} ({{ u.rol }})
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <button class="btn btn-ghost btn-sm" onclick="limpiarFiltros()">
+    Limpiar Filtros
+  </button>
+</div>
+
+{% if vista != 'lista' %}
+<!-- ══ KANBAN VIEW ═══════════════════════════════════════ -->
+<div class="kanban-board">
+
+  <!-- Columna: PENDIENTE -->
+  <div class="kanban-col" ondragover="allowDrop(event)" ondrop="drop(event, 'pendiente')">
+    <div class="kanban-col-header">
+      <div class="kanban-col-dot" style="background: #94A3B8;"></div>
+      <span class="kanban-col-name">Pendiente</span>
+      <span class="kanban-col-count">{{ kanban.pendiente|length }}</span>
+    </div>
+    <div class="kanban-col-body" id="col-pendiente">
+      {% for t in kanban.pendiente %}
+        {% include 'tareas/_kanban_card.html' %}
+      {% else %}
+        <div style="text-align: center; color: var(--c-text-3); font-size: .78rem; padding: 20px 0;">Sin tareas</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Columna: EN PROGRESO -->
+  <div class="kanban-col" ondragover="allowDrop(event)" ondrop="drop(event, 'en_progreso')">
+    <div class="kanban-col-header">
+      <div class="kanban-col-dot" style="background: var(--c-primary);"></div>
+      <span class="kanban-col-name">En Progreso</span>
+      <span class="kanban-col-count">{{ kanban.en_progreso|length }}</span>
+    </div>
+    <div class="kanban-col-body" id="col-en_progreso">
+      {% for t in kanban.en_progreso %}
+        {% include 'tareas/_kanban_card.html' %}
+      {% else %}
+        <div style="text-align: center; color: var(--c-text-3); font-size: .78rem; padding: 20px 0;">Sin tareas</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Columna: BLOQUEADA -->
+  <div class="kanban-col" style="background: #FEF2F2; border-color: #FCA5A5;" ondragover="allowDrop(event)" ondrop="drop(event, 'bloqueada')">
+    <div class="kanban-col-header" style="border-color: #FCA5A5;">
+      <div class="kanban-col-dot" style="background: var(--c-danger);"></div>
+      <span class="kanban-col-name" style="color: #B91C1C;">Bloqueada</span>
+      <span class="kanban-col-count" style="background: #FEE2E2; color: #B91C1C; border-color: #FCA5A5;">{{ kanban.bloqueada|length }}</span>
+    </div>
+    <div class="kanban-col-body" id="col-bloqueada">
+      {% for t in kanban.bloqueada %}
+        {% include 'tareas/_kanban_card.html' %}
+      {% else %}
+        <div style="text-align: center; color: var(--c-text-3); font-size: .78rem; padding: 20px 0;">Sin tareas bloqueadas</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Columna: COMPLETADA -->
+  <div class="kanban-col" ondragover="allowDrop(event)" ondrop="drop(event, 'completada')">
+    <div class="kanban-col-header">
+      <div class="kanban-col-dot" style="background: var(--c-success);"></div>
+      <span class="kanban-col-name">Completada</span>
+      <span class="kanban-col-count">{{ kanban.completada|length }}</span>
+    </div>
+    <div class="kanban-col-body" id="col-completada">
+      {% for t in kanban.completada %}
+        {% include 'tareas/_kanban_card.html' %}
+      {% else %}
+        <div style="text-align: center; color: var(--c-text-3); font-size: .78rem; padding: 20px 0;">Sin tareas</div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+
+{% else %}
+<!-- ══ LIST VIEW ═════════════════════════════════════════ -->
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Tarea</th>
+          <th>Proyecto</th>
+          <th>Hito</th>
+          <th>Asignado</th>
+          <th>Prioridad</th>
+          <th>Vencimiento</th>
+          <th>Horas</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in todas_tareas %}
+        <tr>
+          <td>
+            <a href="{{ url_for('detalle_tarea', id_tarea=t.id_tarea) }}" class="td-main" style="color: var(--c-primary);">
+              {{ t.nombre_tarea }}
+            </a>
+            {% if t.num_dependencias > 0 %}
+            <span class="dep-indicator" style="display: block; margin-top: 2px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              Tiene {{ t.num_dependencias }} dep.
+            </span>
+            {% endif %}
+          </td>
+          <td style="font-size: .8rem; color: var(--c-text-2);">{{ t.nombre_proyecto }}</td>
+          <td style="font-size: .78rem; color: var(--c-text-3);">{{ t.nombre_hito or '—' }}</td>
+          <td>
+            {% if t.nombre_asignado %}
+            <div class="avatar-row">
+              <div class="avatar avatar-sm avatar-slate">{{ t.nombre_asignado[:2]|upper }}</div>
+              <span style="font-size: .8rem;">{{ t.nombre_asignado }}</span>
+            </div>
+            {% else %}
+            <span style="color: var(--c-text-3);">—</span>
+            {% endif %}
+          </td>
+          <td><span class="badge badge-{{ t.prioridad }}">{{ t.prioridad }}</span></td>
+          <td style="font-size: .8rem;">{{ t.fecha_vencimiento.strftime('%d/%m/%Y') if t.fecha_vencimiento else '—' }}</td>
+          <td style="font-size: .78rem;">{{ t.tiempo_real_horas }}h / {{ t.tiempo_estimado_horas }}h</td>
+          <td><span class="badge badge-{{ t.estado }}">{{ t.estado|replace('_',' ') }}</span></td>
+          <td>
+            <div class="btn-group">
+              <a href="{{ url_for('detalle_tarea', id_tarea=t.id_tarea) }}" class="btn btn-ghost btn-sm">Ver</a>
+              <a href="{{ url_for('editar_tarea', id_tarea=t.id_tarea) }}" class="btn btn-ghost btn-sm">✏️</a>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr class="empty-row"><td colspan="9">No se encontraron tareas con los filtros seleccionados.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+<script>
+function aplicarFiltros() {
+  const p = document.getElementById('f_proyecto').value;
+  const u = document.getElementById('f_usuario').value;
+  let url = "{{ url_for('listar_tareas') }}?vista={{ vista }}&";
+  if (p) url += `proyecto=${p}&`;
+  if (u) url += `usuario=${u}&`;
+  window.location.href = url;
+}
+function limpiarFiltros() {
+  window.location.href = "{{ url_for('listar_tareas', vista=vista) }}";
+}
+
+// Drag & Drop Functions for Kanban
+function drag(ev) {
+  ev.dataTransfer.setData("text/plain", ev.currentTarget.dataset.id);
+}
+
+function allowDrop(ev) {
+  ev.preventDefault();
+}
+
+function drop(ev, nuevoEstado) {
+  ev.preventDefault();
+  const idTarea = ev.dataTransfer.getData("text/plain");
+  
+  if (!idTarea) return;
+
+  fetch(`/api/tareas/${idTarea}/estado`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ estado: nuevoEstado })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      window.location.reload(); // Reload to see the changes and the updated log
+    } else {
+      alert("Error: " + data.error);
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Hubo un error al actualizar la tarea.");
+  });
+}
+</script>
+{% endblock %}

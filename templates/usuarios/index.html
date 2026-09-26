@@ -1,0 +1,85 @@
+{% extends 'layout.html' %}
+
+{% block title %}Directorio de Usuarios - ProjectFlow ERP{% endblock %}
+{% block page_title %}Directorio de Usuarios{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <h1>Directorio de Recursos</h1>
+    <p>Gestión de usuarios, roles del sistema, tarifas y habilidades técnicas</p>
+  </div>
+  <a href="{{ url_for('nuevo_usuario') }}" class="btn btn-primary btn-sm">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+    Nuevo Usuario
+  </a>
+</div>
+
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Rol</th>
+          <th>Equipo</th>
+          <th>Habilidades</th>
+          <th>Costo / Hora</th>
+          <th>Carga Pendiente</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in usuarios %}
+        <tr>
+          <td>
+            <div class="avatar-row">
+              <div class="avatar avatar-slate">{{ u.nombre[:2]|upper }}</div>
+              <span class="td-main">{{ u.nombre }}</span>
+            </div>
+          </td>
+          <td><a href="mailto:{{ u.email }}" style="color: var(--c-primary); font-size: .85rem;">{{ u.email }}</a></td>
+          <td><span class="badge-rol">{{ u.rol|replace('_',' ')|capitalize }}</span></td>
+          <td>{{ u.nombre_equipo or '— Sin equipo' }}</td>
+          <td>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px; max-width: 240px;">
+              {% for h in u.habilidades %}
+                {% if h %}<span class="badge-skill">{{ h }}</span>{% endif %}
+              {% else %}
+                <span style="color: var(--c-text-3); font-size: .75rem;">—</span>
+              {% endfor %}
+            </div>
+          </td>
+          <td style="font-weight: 600;">${{ "%.2f"|format(u.costo_hora) }}/h</td>
+          <td>{{ u.horas_pendientes }}h</td>
+          <td>
+            {% if u.activo %}
+            <span style="display: inline-flex; align-items: center; gap: 5px; font-size: .78rem; color: var(--c-success); font-weight: 600;">
+              <span class="status-dot active"></span> Activo
+            </span>
+            {% else %}
+            <span style="display: inline-flex; align-items: center; gap: 5px; font-size: .78rem; color: var(--c-text-3);">
+              <span class="status-dot inactive"></span> Inactivo
+            </span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="btn-group">
+              <a href="{{ url_for('editar_usuario', id_usuario=u.id_usuario) }}" class="btn btn-ghost btn-sm">✏️</a>
+              <form action="{{ url_for('eliminar_usuario', id_usuario=u.id_usuario) }}" method="POST" style="display:inline;"
+                    onsubmit="return confirm('¿Eliminar este usuario?');">
+                <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr class="empty-row"><td colspan="9">No hay usuarios registrados.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

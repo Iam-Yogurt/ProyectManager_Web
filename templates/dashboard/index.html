@@ -1,0 +1,191 @@
+{% extends 'layout.html' %}
+
+{% block title %}Dashboard General - ProjectFlow ERP{% endblock %}
+{% block page_title %}Vista General / Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <h1>Panel de Control Ejecutivo</h1>
+    <p>Métricas clave de proyectos, control de recursos y salud de entregables</p>
+  </div>
+  <div class="btn-group">
+    <a href="{{ url_for('nueva_tarea') }}" class="btn btn-ghost btn-sm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      Nueva Tarea
+    </a>
+    <a href="{{ url_for('nuevo_proyecto') }}" class="btn btn-primary btn-sm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      Nuevo Proyecto
+    </a>
+  </div>
+</div>
+
+<!-- ══ 1. KPI CARDS ══════════════════════════════════════ -->
+<div class="kpi-grid">
+  <!-- Total Proyectos Activos -->
+  <div class="kpi-card">
+    <div class="kpi-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      Proyectos Activos
+    </div>
+    <div class="kpi-value" style="color: var(--c-primary);">{{ kpi_proyectos.activos }}</div>
+    <div class="kpi-sub">
+      <span>{{ kpi_proyectos.planificacion }} Planif.</span> ·
+      <span>{{ kpi_proyectos.en_desarrollo }} Desarr.</span> ·
+      <span>{{ kpi_proyectos.pruebas }} Pruebas</span>
+    </div>
+  </div>
+
+  <!-- Presupuesto Consumido vs Asignado -->
+  <div class="kpi-card">
+    <div class="kpi-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Presupuesto Consumido
+    </div>
+    <div class="kpi-value" style="color: {% if pct_presupuesto > 90 %}var(--c-danger){% else %}var(--c-text){% endif %};">
+      ${{ "%.0f"|format(costo_total_consumido) }}
+    </div>
+    <div class="progress-wrap" style="margin-top: 6px;">
+      <div class="progress-bar-outer">
+        <div class="progress-bar-inner {% if pct_presupuesto > 100 %}danger{% elif pct_presupuesto > 75 %}warning{% else %}success{% endif %}"
+             style="width: {{ [pct_presupuesto, 100]|min }}%;"></div>
+      </div>
+      <span class="progress-label">{{ pct_presupuesto }}%</span>
+    </div>
+    <div class="kpi-sub" style="margin-top: 4px;">de ${{ "%.0f"|format(kpi_proyectos.presupuesto_total_asignado) }} total asignado</div>
+  </div>
+
+  <!-- Tareas Vencidas / Bloqueadas -->
+  <div class="kpi-card">
+    <div class="kpi-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Alertas de Tareas
+    </div>
+    <div class="kpi-value" style="color: {% if kpi_tareas.vencidas > 0 or kpi_tareas.bloqueadas > 0 %}var(--c-danger){% else %}var(--c-success){% endif %};">
+      {{ kpi_tareas.vencidas + kpi_tareas.bloqueadas }}
+    </div>
+    <div class="kpi-sub">
+      <span class="down">{{ kpi_tareas.vencidas }} vencidas</span> ·
+      <span class="down">{{ kpi_tareas.bloqueadas }} bloqueadas</span> ·
+      <span class="up">{{ kpi_tareas.completadas }} listas</span>
+    </div>
+  </div>
+
+  <!-- Total Tareas en Progreso -->
+  <div class="kpi-card">
+    <div class="kpi-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Tareas en Ejecución
+    </div>
+    <div class="kpi-value" style="color: var(--c-info);">{{ kpi_tareas.en_progreso }}</div>
+    <div class="kpi-sub">de {{ kpi_tareas.total_tareas }} tareas totales registradas</div>
+  </div>
+</div>
+
+<!-- ══ 2. SECCIÓN: PROYECTOS EN RIESGO & CARGA DE TRABAJO ══════════ -->
+<div class="detail-layout">
+
+  <!-- Left: Proyectos en Riesgo & Proyectos Activos -->
+  <div>
+    <!-- Proyectos en Riesgo -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--c-danger);"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Proyectos en Riesgo Operativo o Financiero
+        </div>
+        {% if proyectos_en_riesgo %}
+        <span class="badge badge-alta">{{ proyectos_en_riesgo|length }} en alerta</span>
+        {% else %}
+        <span class="badge badge-finalizado">0 en riesgo</span>
+        {% endif %}
+      </div>
+      <div class="card-body">
+        {% if proyectos_en_riesgo %}
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          {% for pr in proyectos_en_riesgo %}
+          <div class="project-card risk" style="padding: 14px;">
+            <div class="project-card-header">
+              <div>
+                <a href="{{ url_for('detalle_proyecto', id_proyecto=pr.id_proyecto) }}" class="project-card-name" style="color: var(--c-text);">
+                  {{ pr.nombre_proyecto }}
+                </a>
+                <div class="project-card-client">Cliente: {{ pr.nombre_cliente }} · Líder: {{ pr.nombre_lider }}</div>
+              </div>
+              <span class="badge badge-{{ pr.estado }}">{{ pr.estado|replace('_',' ') }}</span>
+            </div>
+
+            <!-- Alertas específicas del proyecto -->
+            <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 6px;">
+              {% for motivo in pr.motivos_riesgo %}
+              <div class="risk-banner">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span>{{ motivo }}</span>
+              </div>
+              {% endfor %}
+            </div>
+
+            <div class="project-card-footer" style="margin-top: 8px;">
+              <div style="font-size: .78rem; color: var(--c-text-3);">
+                Consumido: <strong>${{ "%.2f"|format(pr.costo_consumido) }}</strong> / ${{ "%.2f"|format(pr.presupuesto_total) }}
+              </div>
+              <a href="{{ url_for('detalle_proyecto', id_proyecto=pr.id_proyecto) }}" class="btn btn-ghost btn-sm">
+                Gestionar Proyecto →
+              </a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 28px 0; color: var(--c-text-3);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width: 36px; height: 36px; color: var(--c-success); margin-bottom: 8px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <div style="font-weight: 600; color: var(--c-text);">Todos los proyectos operan dentro de los parámetros seguros</div>
+          <div style="font-size: .8rem; margin-top: 3px;">Presupuestos y cronogramas sin desviaciones críticas.</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Carga de Trabajo de Usuarios (Histograma / Barras Horizontales) -->
+  <div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Carga de Trabajo
+        </div>
+        <a href="{{ url_for('listar_equipos') }}" class="btn btn-ghost btn-sm" style="padding: 3px 8px; font-size: .75rem;">Ver Todos</a>
+      </div>
+      <div class="card-body">
+        <p style="font-size: .78rem; color: var(--c-text-3); margin-bottom: 16px;">
+          Horas estimadas pendientes por recurso activo:
+        </p>
+
+        <div class="workload-list">
+          {% for u in carga_usuarios %}
+          {% set horas_val = u.horas_pendientes | float %}
+          {% set pct_carga = (horas_val / max_horas * 100) if max_horas > 0 else 0 %}
+          <div class="workload-row">
+            <div class="workload-user">
+              <strong>{{ u.nombre }}</strong>
+              <span>{{ u.rol }} · {{ u.nombre_equipo or 'Sin equipo' }}</span>
+            </div>
+            <div class="workload-bar-wrap">
+              <div class="workload-bar"
+                   style="width: {{ pct_carga }}%; background-color: {% if horas_val > 30 %}var(--c-danger){% elif horas_val > 15 %}var(--c-primary){% else %}var(--c-success){% endif %};">
+              </div>
+            </div>
+            <div class="workload-hours">
+              {{ u.horas_pendientes }}h
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

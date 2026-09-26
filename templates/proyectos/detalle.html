@@ -1,0 +1,304 @@
+{% extends 'layout.html' %}
+
+{% block title %}{{ proyecto.nombre_proyecto }} - ProjectFlow ERP{% endblock %}
+{% block page_title %}{{ proyecto.nombre_proyecto }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+      <a href="{{ url_for('listar_proyectos') }}" style="color: var(--c-text-3); font-size: .85rem;">Proyectos</a>
+      <span style="color: var(--c-text-3);">/</span>
+      <span style="font-size: .85rem; color: var(--c-text-2); font-weight: 600;">Detalle</span>
+    </div>
+    <h1>{{ proyecto.nombre_proyecto }}</h1>
+    <p>Cliente: <strong>{{ proyecto.nombre_cliente }}</strong> · Líder: <strong>{{ proyecto.nombre_lider }}</strong></p>
+  </div>
+
+  <div class="btn-group">
+    <a href="{{ url_for('nueva_tarea', proyecto=proyecto.id_proyecto) }}" class="btn btn-primary btn-sm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      Añadir Tarea
+    </a>
+    <a href="{{ url_for('editar_proyecto', id_proyecto=proyecto.id_proyecto) }}" class="btn btn-ghost btn-sm">
+      ✏️ Editar Proyecto
+    </a>
+    <form action="{{ url_for('eliminar_proyecto', id_proyecto=proyecto.id_proyecto) }}" method="POST" style="display:inline;"
+          onsubmit="return confirm('¿Eliminar este proyecto y todas sus dependencias?');">
+      <button type="submit" class="btn btn-danger btn-sm">🗑️ Eliminar</button>
+    </form>
+  </div>
+</div>
+
+<!-- ══ RESUMEN FINANCIERO Y AVANCE ════════════════════════ -->
+<div class="kpi-grid">
+  <!-- Presupuesto Total -->
+  <div class="kpi-card">
+    <div class="kpi-label">Presupuesto Asignado</div>
+    <div class="kpi-value" style="color: var(--c-primary);">${{ "%.2f"|format(proyecto.presupuesto_total) }}</div>
+    <div class="kpi-sub">Total contratado con el cliente</div>
+  </div>
+
+  <!-- Costo Consumido Real -->
+  <div class="kpi-card">
+    <div class="kpi-label">Costo Real Consumido</div>
+    <div class="kpi-value" style="color: {% if costo_consumido > proyecto.presupuesto_total %}var(--c-danger){% else %}var(--c-text){% endif %};">
+      ${{ "%.2f"|format(costo_consumido) }}
+    </div>
+    <div class="progress-wrap" style="margin-top: 6px;">
+      <div class="progress-bar-outer">
+        <div class="progress-bar-inner {% if pct_consumo > 100 %}danger{% elif pct_consumo > 80 %}warning{% else %}success{% endif %}"
+             style="width: {{ [pct_consumo, 100]|min }}%;"></div>
+      </div>
+      <span class="progress-label">{{ pct_consumo }}%</span>
+    </div>
+    <div class="kpi-sub" style="margin-top: 4px;">Basado en {{ finanzas.total_horas_reales }}h reales × tarifas/hora</div>
+  </div>
+
+  <!-- Margen Restante -->
+  <div class="kpi-card">
+    <div class="kpi-label">Margen Presupuestario</div>
+    <div class="kpi-value" style="color: {% if margen_restante < 0 %}var(--c-danger){% else %}var(--c-success){% endif %};">
+      ${{ "%.2f"|format(margen_restante) }}
+    </div>
+    <div class="kpi-sub">
+      {% if margen_restante < 0 %}
+      <span class="down">⚠️ Presupuesto sobregirado</span>
+      {% else %}
+      <span class="up">Disponible para ejecución</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Avance de Tareas -->
+  <div class="kpi-card">
+    <div class="kpi-label">Avance Global</div>
+    <div class="kpi-value" style="color: var(--c-success);">{{ proyecto.avance }}%</div>
+    <div class="kpi-sub">
+      {{ tareas | selectattr('estado', 'equalto', 'completada') | list | length }} de {{ tareas|length }} tareas completadas
+    </div>
+  </div>
+</div>
+
+<!-- ══ DETALLE GRID (Tareas + Timeline Hitos + Meta) ════════ -->
+<div class="detail-layout">
+
+  <!-- Left: Lista de Tareas y Timeline de Hitos -->
+  <div>
+
+    <!-- Timeline de Hitos -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+          Línea de Tiempo de Hitos (Milestones)
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('form-hito').style.display = document.getElementById('form-hito').style.display === 'none' ? 'block' : 'none'">
+          ➕ Añadir Hito
+        </button>
+      </div>
+
+      <div class="card-body">
+        <!-- Formulario Oculto para crear Hito -->
+        <div id="form-hito" style="display: none; background: var(--c-bg); border: 1px solid var(--c-border); border-radius: var(--r-md); padding: 14px; margin-bottom: 20px;">
+          <form action="{{ url_for('crear_hito', id_proyecto=proyecto.id_proyecto) }}" method="POST" class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Nombre del Hito *</label>
+              <input type="text" name="nombre_hito" class="form-input" required placeholder="Ej: Lanzamiento Beta / QA">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Fecha Objetivo *</label>
+              <input type="date" name="fecha_objetivo" class="form-input" required>
+            </div>
+            <div class="col-span-2" style="display: flex; justify-content: flex-end; gap: 8px;">
+              <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('form-hito').style.display='none'">Cancelar</button>
+              <button type="submit" class="btn btn-primary btn-sm">Guardar Hito</button>
+            </div>
+          </form>
+        </div>
+
+        {% if hitos %}
+        <div class="timeline">
+          {% for h in hitos %}
+          <div class="timeline-item">
+            <div class="timeline-dot {% if h.alcanzado %}done{% else %}pending{% endif %}"></div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <div class="timeline-name" style="{% if h.alcanzado %}text-decoration: line-through; color: var(--c-text-3);{% endif %}">
+                  {{ h.nombre_hito }}
+                </div>
+                <div class="timeline-date">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  Fecha objetivo: {{ h.fecha_objetivo.strftime('%d/%m/%Y') }}
+                </div>
+              </div>
+
+              <!-- Toggle alcanzado checkbox -->
+              <form action="{{ url_for('toggle_hito', id_hito=h.id_hito) }}" method="POST">
+                <input type="hidden" name="id_proyecto" value="{{ proyecto.id_proyecto }}">
+                <button type="submit" class="btn btn-sm {% if h.alcanzado %}btn-success{% else %}btn-ghost{% endif %}" style="padding: 4px 10px; font-size: .75rem;">
+                  {% if h.alcanzado %}✓ Alcanzado{% else %}Marcar Alcanzado{% endif %}
+                </button>
+              </form>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; color: var(--c-text-3); padding: 18px 0; font-size: .85rem;">
+          No hay hitos definidos para este proyecto aún.
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Tareas del Proyecto -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Tareas del Proyecto ({{ tareas|length }})
+        </div>
+        <a href="{{ url_for('nueva_tarea', proyecto=proyecto.id_proyecto) }}" class="btn btn-ghost btn-sm">
+          ➕ Nueva Tarea
+        </a>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Tarea</th>
+              <th>Asignado</th>
+              <th>Hito</th>
+              <th>Prioridad</th>
+              <th>Estado</th>
+              <th>Horas</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for t in tareas %}
+            <tr>
+              <td>
+                <a href="{{ url_for('detalle_tarea', id_tarea=t.id_tarea) }}" class="td-main" style="color: var(--c-primary);">
+                  {{ t.nombre_tarea }}
+                </a>
+                {% if t.num_dependencias > 0 %}
+                <span class="dep-indicator" style="display: block; margin-top: 2px;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                  Tiene {{ t.num_dependencias }} dependencia(s)
+                </span>
+                {% endif %}
+              </td>
+              <td>
+                {% if t.nombre_asignado %}
+                <div class="avatar-row">
+                  <div class="avatar avatar-sm avatar-slate">{{ t.nombre_asignado[:2]|upper }}</div>
+                  <span style="font-size: .8rem;">{{ t.nombre_asignado }}</span>
+                </div>
+                {% else %}
+                <span style="color: var(--c-text-3);">— Sin asignar</span>
+                {% endif %}
+              </td>
+              <td>
+                <span style="font-size: .78rem; color: var(--c-text-2);">{{ t.nombre_hito or '—' }}</span>
+              </td>
+              <td><span class="badge badge-{{ t.prioridad }}">{{ t.prioridad }}</span></td>
+              <td><span class="badge badge-{{ t.estado }}">{{ t.estado|replace('_',' ') }}</span></td>
+              <td style="font-size: .78rem;">
+                {{ t.tiempo_real_horas }}h / {{ t.tiempo_estimado_horas }}h
+              </td>
+              <td>
+                <div class="btn-group">
+                  <a href="{{ url_for('detalle_tarea', id_tarea=t.id_tarea) }}" class="btn btn-ghost btn-sm">Ver</a>
+                  <a href="{{ url_for('editar_tarea', id_tarea=t.id_tarea) }}" class="btn btn-ghost btn-sm">✏️</a>
+                </div>
+              </td>
+            </tr>
+            {% else %}
+            <tr class="empty-row"><td colspan="7">No hay tareas registradas en este proyecto.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right: Meta Info & Cliente -->
+  <div>
+    <!-- Metadatos del Proyecto -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Información General</div>
+        <span class="badge badge-{{ proyecto.estado }}">{{ proyecto.estado|replace('_',' ') }}</span>
+      </div>
+      <div class="card-body">
+        <div class="meta-list">
+          <div class="meta-item">
+            <span class="meta-key">ID</span>
+            <span class="meta-val">#{{ proyecto.id_proyecto }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Fecha Inicio</span>
+            <span class="meta-val">{{ proyecto.fecha_inicio.strftime('%d/%m/%Y') }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Fin Estimado</span>
+            <span class="meta-val">{{ proyecto.fecha_fin_estimada.strftime('%d/%m/%Y') }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Fin Real</span>
+            <span class="meta-val">{{ proyecto.fecha_fin_real.strftime('%d/%m/%Y') if proyecto.fecha_fin_real else 'En curso' }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Líder Asignado</span>
+            <span class="meta-val">{{ proyecto.nombre_lider }} ({{ proyecto.rol_lider }})</span>
+          </div>
+        </div>
+
+        {% if proyecto.descripcion %}
+        <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--c-border-l);">
+          <div class="detail-section-title">Descripción del Alcance</div>
+          <p style="font-size: .85rem; color: var(--c-text-2); line-height: 1.6;">{{ proyecto.descripcion }}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Info del Cliente -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Datos del Cliente</div>
+      </div>
+      <div class="card-body">
+        <div class="meta-list">
+          <div class="meta-item">
+            <span class="meta-key">Empresa</span>
+            <span class="meta-val">{{ proyecto.nombre_cliente }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Contacto</span>
+            <span class="meta-val">{{ proyecto.persona_contacto or '—' }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Email</span>
+            <span class="meta-val">
+              {% if proyecto.email_contacto %}
+              <a href="mailto:{{ proyecto.email_contacto }}" style="color: var(--c-primary);">{{ proyecto.email_contacto }}</a>
+              {% else %}—{% endif %}
+            </span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Teléfono</span>
+            <span class="meta-val">{{ proyecto.telefono or '—' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

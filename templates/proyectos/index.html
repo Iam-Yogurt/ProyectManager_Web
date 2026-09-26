@@ -1,0 +1,193 @@
+{% extends 'layout.html' %}
+
+{% block title %}Proyectos e Hitos - ProjectFlow ERP{% endblock %}
+{% block page_title %}Proyectos e Hitos{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <h1>Gestión de Proyectos</h1>
+    <p>Supervisión de entregables, avance porcentual y control de presupuestos</p>
+  </div>
+  <div class="btn-group">
+    <!-- View Switcher -->
+    <div class="view-toggle">
+      <a href="{{ url_for('listar_proyectos', vista='grid') }}" class="{% if view_mode != 'list' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Cuadrícula
+      </a>
+      <a href="{{ url_for('listar_proyectos', vista='list') }}" class="{% if view_mode == 'list' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        Tabla
+      </a>
+    </div>
+
+    <a href="{{ url_for('nuevo_proyecto') }}" class="btn btn-primary btn-sm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      Nuevo Proyecto
+    </a>
+  </div>
+</div>
+
+<!-- Stat chips -->
+<div class="stat-chips">
+  <div class="stat-chip primary">
+    <span class="chip-num">{{ proyectos|length }}</span> Proyectos Totales
+  </div>
+  <div class="stat-chip success">
+    <span class="chip-num">{{ proyectos | selectattr('estado', 'equalto', 'finalizado') | list | length }}</span> Finalizados
+  </div>
+  <div class="stat-chip warning">
+    <span class="chip-num">{{ proyectos | selectattr('estado', 'equalto', 'en_desarrollo') | list | length }}</span> En Desarrollo
+  </div>
+  <div class="stat-chip danger">
+    <span class="chip-num">{{ proyectos | selectattr('es_riesgo', 'equalto', True) | list | length }}</span> En Riesgo
+  </div>
+</div>
+
+{% if view_mode != 'list' %}
+<!-- ══ GRID VIEW ════════════════════════════════════════ -->
+<div class="project-grid">
+  {% for p in proyectos %}
+  <div class="project-card {% if p.es_riesgo %}risk{% endif %}">
+    <div class="project-card-header">
+      <div>
+        <a href="{{ url_for('detalle_proyecto', id_proyecto=p.id_proyecto) }}" class="project-card-name">
+          {{ p.nombre_proyecto }}
+        </a>
+        <div class="project-card-client">{{ p.nombre_cliente }}</div>
+      </div>
+      <span class="badge badge-{{ p.estado }}">{{ p.estado|replace('_',' ') }}</span>
+    </div>
+
+    <div class="project-card-dates">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      {{ p.fecha_inicio.strftime('%d/%m/%Y') if p.fecha_inicio else '—' }} → {{ p.fecha_fin_estimada.strftime('%d/%m/%Y') if p.fecha_fin_estimada else '—' }}
+    </div>
+
+    <!-- Avance % -->
+    <div>
+      <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: .78rem;">
+        <span style="color: var(--c-text-3);">Avance de Tareas</span>
+        <span style="font-weight: 700; color: var(--c-text);">{{ p.avance }}%</span>
+      </div>
+      <div class="progress-bar-outer">
+        <div class="progress-bar-inner {% if p.avance == 100 %}success{% endif %}" style="width: {{ p.avance }}%;"></div>
+      </div>
+      <div style="font-size: .72rem; color: var(--c-text-3); margin-top: 4px;">
+        {{ p.tareas_completadas }} de {{ p.total_tareas }} tareas completadas
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="project-card-footer">
+      <div class="avatar-row">
+        <div class="avatar avatar-sm avatar-slate">
+          {{ p.nombre_lider[:2]|upper }}
+        </div>
+        <div>
+          <div class="avatar-name" style="font-size: .78rem;">{{ p.nombre_lider }}</div>
+          <div class="avatar-sub">Líder</div>
+        </div>
+      </div>
+
+      <div style="text-align: right;">
+        <div style="font-size: .78rem; font-weight: 700; color: var(--c-text);">
+          ${{ "%.0f"|format(p.presupuesto_total) }}
+        </div>
+        <div style="font-size: .7rem; color: {% if p.costo_consumido > p.presupuesto_total %}var(--c-danger){% else %}var(--c-text-3){% endif %};">
+          Consumido: ${{ "%.0f"|format(p.costo_consumido) }}
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 8px; margin-top: 4px;">
+      <a href="{{ url_for('detalle_proyecto', id_proyecto=p.id_proyecto) }}" class="btn btn-ghost btn-sm" style="flex: 1; justify-content: center;">
+        Detalles
+      </a>
+      <a href="{{ url_for('editar_proyecto', id_proyecto=p.id_proyecto) }}" class="btn btn-ghost btn-sm" title="Editar">
+        ✏️
+      </a>
+    </div>
+  </div>
+  {% else %}
+  <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 48px 0; color: var(--c-text-3);">
+    No hay proyectos registrados en este momento.
+  </div>
+  {% endfor %}
+</div>
+
+{% else %}
+<!-- ══ LIST VIEW ════════════════════════════════════════ -->
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Proyecto</th>
+          <th>Cliente</th>
+          <th>Líder</th>
+          <th>Presupuesto / Consumido</th>
+          <th>Fechas</th>
+          <th>Estado</th>
+          <th>Avance</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in proyectos %}
+        <tr>
+          <td>
+            <a href="{{ url_for('detalle_proyecto', id_proyecto=p.id_proyecto) }}" class="td-main" style="color: var(--c-primary);">
+              {{ p.nombre_proyecto }}
+            </a>
+            {% if p.es_riesgo %}
+            <span class="badge badge-alta" style="margin-left: 6px;">Riesgo</span>
+            {% endif %}
+          </td>
+          <td>{{ p.nombre_cliente }}</td>
+          <td>
+            <div class="avatar-row">
+              <div class="avatar avatar-sm avatar-slate">{{ p.nombre_lider[:2]|upper }}</div>
+              <span>{{ p.nombre_lider }}</span>
+            </div>
+          </td>
+          <td>
+            <div style="font-weight: 600;">${{ "%.2f"|format(p.presupuesto_total) }}</div>
+            <div style="font-size: .75rem; color: {% if p.costo_consumido > p.presupuesto_total %}var(--c-danger){% else %}var(--c-text-3){% endif %};">
+              Consumido: ${{ "%.2f"|format(p.costo_consumido) }}
+            </div>
+          </td>
+          <td>
+            <div style="font-size: .8rem;">{{ p.fecha_inicio.strftime('%d/%m/%Y') if p.fecha_inicio else '—' }}</div>
+            <div style="font-size: .72rem; color: var(--c-text-3);">Est: {{ p.fecha_fin_estimada.strftime('%d/%m/%Y') if p.fecha_fin_estimada else '—' }}</div>
+          </td>
+          <td><span class="badge badge-{{ p.estado }}">{{ p.estado|replace('_',' ') }}</span></td>
+          <td>
+            <div class="progress-wrap" style="min-width: 110px;">
+              <div class="progress-bar-outer">
+                <div class="progress-bar-inner {% if p.avance == 100 %}success{% endif %}" style="width: {{ p.avance }}%;"></div>
+              </div>
+              <span class="progress-label">{{ p.avance }}%</span>
+            </div>
+          </td>
+          <td>
+            <div class="btn-group">
+              <a href="{{ url_for('detalle_proyecto', id_proyecto=p.id_proyecto) }}" class="btn btn-ghost btn-sm">Ver</a>
+              <a href="{{ url_for('editar_proyecto', id_proyecto=p.id_proyecto) }}" class="btn btn-ghost btn-sm">✏️</a>
+              <form action="{{ url_for('eliminar_proyecto', id_proyecto=p.id_proyecto) }}" method="POST" style="display:inline;"
+                    onsubmit="return confirm('¿Eliminar este proyecto y todas sus tareas?');">
+                <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr class="empty-row"><td colspan="8">No hay proyectos registrados.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

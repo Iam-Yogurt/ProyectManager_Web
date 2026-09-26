@@ -1,10 +1,15 @@
+import os
 import psycopg2
+from dotenv import load_dotenv
+
+# Cargar variables de entorno desde el archivo .env
+load_dotenv()
 
 def obtener_conexion():
     return psycopg2.connect(
-        host="localhost",
-        database="proyectmanager-db",
-        user="postgres",
-        password="angel",  # La clave de tu usuario postgres en pgAdmin
-        port="5432"
+        host=os.getenv("DB_HOST", "localhost"),
+        database=os.getenv("DB_NAME", "proyectmanager-db"),
+        user=os.getenv("DB_USER", "postgres"),
+        password=os.getenv("DB_PASSWORD", "genesisdsr2003"),
+        port=os.getenv("DB_PORT", "5432")
     )

@@ -1,0 +1,44 @@
+{% extends 'layout.html' %}
+
+{% block title %}{{ 'Editar Equipo' if equipo else 'Nuevo Equipo' }} - ProjectFlow ERP{% endblock %}
+{% block page_title %}{{ 'Editar Equipo' if equipo else 'Crear Nuevo Equipo' }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+      <a href="{{ url_for('listar_equipos') }}" style="color: var(--c-text-3); font-size: .85rem;">Equipos</a>
+      <span style="color: var(--c-text-3);">/</span>
+      <span style="font-size: .85rem; color: var(--c-text-2); font-weight: 600;">{{ 'Editar' if equipo else 'Crear' }}</span>
+    </div>
+    <h1>{{ 'Editar Equipo' if equipo else 'Crear Nuevo Equipo' }}</h1>
+    <p>Organice sus recursos por departamento o disciplina de trabajo</p>
+  </div>
+  <a href="{{ url_for('listar_equipos') }}" class="btn btn-ghost btn-sm">⬅️ Volver a Equipos</a>
+</div>
+
+<div class="card" style="max-width: 680px; margin: 0 auto;">
+  <div class="card-header">
+    <div class="card-title">Parámetros del Equipo</div>
+  </div>
+  <div class="card-body">
+    <form action="{{ url_for('actualizar_equipo', id_equipo=equipo.id_equipo) if equipo else url_for('crear_equipo') }}" method="POST">
+      <div class="form-grid">
+        <div class="form-group col-span-2">
+          <label class="form-label">Nombre del Equipo <span class="req">*</span></label>
+          <input type="text" name="nombre_equipo" class="form-input" required
+                 value="{{ equipo.nombre_equipo if equipo else '' }}" placeholder="Ej: DevOps, Arquitectura Cloud, Frontend">
+        </div>
+        <div class="form-group col-span-2">
+          <label class="form-label">Descripción</label>
+          <textarea name="descripcion" class="form-textarea" placeholder="Propósito, responsabilidades y alcance del equipo...">{{ equipo.descripcion or '' if equipo else '' }}</textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <a href="{{ url_for('listar_equipos') }}" class="btn btn-ghost">Cancelar</a>
+        <button type="submit" class="btn btn-primary">💾 {{ 'Guardar Cambios' if equipo else 'Crear Equipo' }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+<a href="{{ url_for('detalle_tarea', id_tarea=t.id_tarea) }}" class="kanban-card" draggable="true" data-id="{{ t.id_tarea }}" ondragstart="drag(event)">
+  <!-- Proyecto / Hito Header -->
+  <div class="kanban-card-project">
+    {{ t.nombre_proyecto }}
+    {% if t.nombre_hito %}
+    · <span style="color: var(--c-primary); font-weight: 500;">🎯 {{ t.nombre_hito }}</span>
+    {% endif %}
+  </div>
+
+  <!-- Tarea Title -->
+  <div class="kanban-card-title">
+    {{ t.nombre_tarea }}
+  </div>
+
+  <!-- Dependency Indicator -->
+  {% if t.num_dependencias > 0 %}
+  <div class="dep-indicator" style="margin-bottom: 6px;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+    Bloqueada por {{ t.num_dependencias }} dependencia(s)
+  </div>
+  {% endif %}
+
+  <!-- Meta Footer: Avatar + Priority + Time -->
+  <div class="kanban-card-meta">
+    <div style="display: flex; align-items: center; gap: 6px;">
+      {% if t.nombre_asignado %}
+      <div class="avatar avatar-sm avatar-slate" title="{{ t.nombre_asignado }} ({{ t.rol_asignado }})">
+        {{ t.nombre_asignado[:2]|upper }}
+      </div>
+      <span style="font-size: .75rem; color: var(--c-text-2);">{{ t.nombre_asignado.split(' ')[0] }}</span>
+      {% else %}
+      <div class="avatar avatar-sm" style="background: #E2E8F0; color: #64748B;" title="Sin asignar">
+        ?
+      </div>
+      {% endif %}
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 6px;">
+      <span class="badge badge-{{ t.prioridad }}">{{ t.prioridad }}</span>
+      <div class="kanban-time {% if t.tiempo_real_horas > t.tiempo_estimado_horas %}over{% endif %}" title="Horas reales / Horas estimadas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+        {{ t.tiempo_real_horas }}h / {{ t.tiempo_estimado_horas }}h
+      </div>
+    </div>
+  </div>
+</a>

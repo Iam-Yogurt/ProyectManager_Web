@@ -1,0 +1,86 @@
+{% extends 'layout.html' %}
+
+{% block title %}{{ 'Editar Usuario' if usuario else 'Nuevo Usuario' }} - ProjectFlow ERP{% endblock %}
+{% block page_title %}{{ 'Editar Usuario' if usuario else 'Registrar Nuevo Usuario' }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+      <a href="{{ url_for('listar_usuarios') }}" style="color: var(--c-text-3); font-size: .85rem;">Usuarios</a>
+      <span style="color: var(--c-text-3);">/</span>
+      <span style="font-size: .85rem; color: var(--c-text-2); font-weight: 600;">{{ 'Editar' if usuario else 'Crear' }}</span>
+    </div>
+    <h1>{{ 'Editar Usuario' if usuario else 'Registrar Nuevo Usuario' }}</h1>
+    <p>Configure los datos de acceso, costo por hora y asignación de equipo</p>
+  </div>
+  <a href="{{ url_for('listar_usuarios') }}" class="btn btn-ghost btn-sm">⬅️ Volver a Usuarios</a>
+</div>
+
+<div class="card" style="max-width: 780px; margin: 0 auto;">
+  <div class="card-header">
+    <div class="card-title">Datos del Recurso</div>
+  </div>
+  <div class="card-body">
+    <form action="{{ url_for('actualizar_usuario', id_usuario=usuario.id_usuario) if usuario else url_for('crear_usuario') }}" method="POST">
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label class="form-label">Nombre Completo <span class="req">*</span></label>
+          <input type="text" name="nombre" class="form-input" required
+                 value="{{ usuario.nombre if usuario else '' }}" placeholder="Ej: María Rodríguez">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Correo Electrónico <span class="req">*</span></label>
+          <input type="email" name="email" class="form-input" required
+                 value="{{ usuario.email if usuario else '' }}" placeholder="usuario@empresa.com">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Rol en el Sistema <span class="req">*</span></label>
+          <select name="rol" class="form-select" required>
+            <option value="">-- Seleccione un Rol --</option>
+            <option value="desarrollador"  {% if usuario and usuario.rol == 'desarrollador' %}selected{% endif %}>Desarrollador</option>
+            <option value="diseñador"      {% if usuario and usuario.rol == 'diseñador' %}selected{% endif %}>Diseñador</option>
+            <option value="analista"       {% if usuario and usuario.rol == 'analista' %}selected{% endif %}>Analista</option>
+            <option value="líder_proyecto" {% if usuario and usuario.rol == 'líder_proyecto' %}selected{% endif %}>Líder de Proyecto</option>
+            <option value="administrador"  {% if usuario and usuario.rol == 'administrador' %}selected{% endif %}>Administrador</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Equipo / Departamento</label>
+          <select name="id_equipo" class="form-select">
+            <option value="">-- Sin equipo asignado --</option>
+            {% for eq in equipos %}
+            <option value="{{ eq.id_equipo }}" {% if usuario and usuario.id_equipo == eq.id_equipo %}selected{% endif %}>
+              {{ eq.nombre_equipo }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Costo por Hora ($) <span class="req">*</span></label>
+          <input type="number" step="0.01" min="0" name="costo_hora" class="form-input" required
+                 value="{{ usuario.costo_hora if usuario else '20.00' }}" placeholder="20.00">
+        </div>
+
+        <div class="form-group" style="justify-content: flex-end; padding-top: 24px;">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" name="activo" {% if not usuario or usuario.activo %}checked{% endif %} style="width: 16px; height: 16px;">
+            <span style="font-weight: 600; font-size: .85rem; color: var(--c-text);">Recurso Activo en el Sistema</span>
+          </label>
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+        <a href="{{ url_for('listar_usuarios') }}" class="btn btn-ghost">Cancelar</a>
+        <button type="submit" class="btn btn-primary">💾 {{ 'Guardar Cambios' if usuario else 'Registrar Usuario' }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
