@@ -1297,5 +1297,60 @@ def api_actualizar_estado_tarea(id_tarea):
         conn.close()
 
 
+# ═══════════════════════════════════════════════
+#  BÚSQUEDA GLOBAL
+# ═══════════════════════════════════════════════
+
+@app.route('/buscar')
+def buscar():
+    q = request.args.get('q', '').strip()
+    proyectos = []
+    tareas = []
+    usuarios = []
+
+    if q:
+        conn = obtener_conexion()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        term = f'%{q}%'
+
+        cur.execute("""
+            SELECT p.id_proyecto, p.nombre_proyecto, p.estado, p.descripcion,
+                   c.nombre_empresa AS nombre_cliente
+            FROM proyecto p
+            JOIN cliente c ON c.id_cliente = p.id_cliente
+            WHERE p.nombre_proyecto ILIKE %s OR p.descripcion ILIKE %s OR c.nombre_empresa ILIKE %s
+            ORDER BY p.nombre_proyecto
+            LIMIT 20
+        """, (term, term, term))
+        proyectos = cur.fetchall()
+
+        cur.execute("""
+            SELECT t.id_tarea, t.nombre_tarea, t.estado, t.prioridad,
+                   p.nombre_proyecto
+            FROM tarea t
+            JOIN proyecto p ON p.id_proyecto = t.id_proyecto
+            WHERE t.nombre_tarea ILIKE %s OR t.descripcion ILIKE %s
+            ORDER BY t.nombre_tarea
+            LIMIT 20
+        """, (term, term))
+        tareas = cur.fetchall()
+
+        cur.execute("""
+            SELECT id_usuario, nombre, email, rol
+            FROM usuario
+            WHERE nombre ILIKE %s OR email ILIKE %s OR rol ILIKE %s
+            ORDER BY nombre
+            LIMIT 20
+        """, (term, term, term))
+        usuarios = cur.fetchall()
+
+        cur.close()
+        conn.close()
+
+    total = len(proyectos) + len(tareas) + len(usuarios)
+    return render_template('buscar.html', q=q, proyectos=proyectos,
+                           tareas=tareas, usuarios=usuarios, total=total)
+
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
