@@ -42,6 +42,10 @@ def _get_equipos_select(cur):
     cur.execute("SELECT id_equipo, nombre_equipo FROM equipo ORDER BY nombre_equipo")
     return cur.fetchall()
 
+def _get_habilidades_select(cur):
+    cur.execute("SELECT id_habilidad, nombre_habilidad FROM habilidad ORDER BY nombre_habilidad")
+    return cur.fetchall()
+
 @app.before_request
 def load_logged_in_user():
     user_id = session.get('user_id')
@@ -1083,9 +1087,10 @@ def nuevo_usuario():
     conn = obtener_conexion()
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     equipos = _get_equipos_select(cur)
+    habilidades = _get_habilidades_select(cur)
     cur.close()
     conn.close()
-    return render_template('usuarios/form.html', usuario=None, equipos=equipos, active_tab='usuarios')
+    return render_template('usuarios/form.html', usuario=None, equipos=equipos, habilidades=habilidades, active_tab='usuarios')
 
 
 @app.route('/usuarios/crear', methods=['POST'])
@@ -1107,8 +1112,14 @@ def crear_usuario():
         cur = conn.cursor()
         cur.execute("""
             INSERT INTO usuario (nombre, email, usuario, contrasena, rol, id_equipo, costo_hora, activo)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING id_usuario
         """, (nombre, email, usuario_val, contrasena_val, rol, id_equipo, costo_hora, activo))
+        nuevo_id = cur.fetchone()[0]
+        
+        habilidades_seleccionadas = request.form.getlist("habilidades")
+        for hab_id in habilidades_seleccionadas:
+            cur.execute("INSERT INTO habilidad_usuario (id_usuario, id_habilidad) VALUES (%s, %s)", (nuevo_id, hab_id))
+
         conn.commit()
         cur.close()
         conn.close()
@@ -1132,9 +1143,14 @@ def editar_perfil():
         conn.close()
         return redirect(url_for('perfil'))
     equipos = _get_equipos_select(cur)
+    habilidades = _get_habilidades_select(cur)
+    
+    cur.execute("SELECT id_habilidad FROM habilidad_usuario WHERE id_usuario = %s", (id_usuario,))
+    usuario["habilidades_ids"] = [row["id_habilidad"] for row in cur.fetchall()]
+    
     cur.close()
     conn.close()
-    return render_template('usuarios/form.html', usuario=usuario, equipos=equipos, active_tab='perfil')
+    return render_template('usuarios/form.html', usuario=usuario, equipos=equipos, habilidades=habilidades, active_tab='perfil')
 
 
 @app.route('/perfil/editar', methods=['POST'])
@@ -1159,6 +1175,12 @@ def actualizar_perfil():
             UPDATE usuario SET nombre=%s, email=%s, usuario=%s, contrasena=%s, rol=%s, id_equipo=%s, costo_hora=%s, activo=%s
             WHERE id_usuario=%s
         """, (nombre, email, usuario_val, contrasena_val, rol, id_equipo, costo_hora, activo, id_usuario))
+        
+        cur.execute("DELETE FROM habilidad_usuario WHERE id_usuario = %s", (id_usuario,))
+        habilidades_seleccionadas = request.form.getlist("habilidades")
+        for hab_id in habilidades_seleccionadas:
+            cur.execute("INSERT INTO habilidad_usuario (id_usuario, id_habilidad) VALUES (%s, %s)", (id_usuario, hab_id))
+
         conn.commit()
         cur.close()
         conn.close()
@@ -1501,3 +1523,4 @@ def buscar():
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
+
