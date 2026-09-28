@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - ProjectFlow ERP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      background-color: var(--c-bg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-container {
+      background: var(--c-card);
+      padding: 40px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 400px;
+    }
+    .login-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+    .login-logo-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--c-primary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+    .login-logo-text {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--c-text);
+      letter-spacing: -0.5px;
+    }
+    .login-logo-text span {
+      color: var(--c-primary);
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-logo">
+      <div class="login-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="24" height="24">
+          <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/>
+        </svg>
+      </div>
+      <div class="login-logo-text">
+        ProjectFlow <span>ERP</span>
+      </div>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div style="margin-bottom: 20px;">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('login') }}">
+      <div class="form-group">
+        <label class="form-label">Usuario</label>
+        <input type="text" name="usuario" class="form-input" required placeholder="Ingrese su usuario">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <input type="password" name="contrasena" class="form-input" required placeholder="Ingrese su contraseña">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Ingresar al Sistema</button>
+    </form>
+  </div>
+</body>
+</html>

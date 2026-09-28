@@ -1,9 +1,10 @@
 import os
 from decimal import Decimal
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, g
 from conexion import obtener_conexion
 from dotenv import load_dotenv
 import psycopg2.extras
+from functools import wraps
 
 load_dotenv()
 
@@ -11,7 +12,7 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "projectflow_erp_secret_key_2026")
 
 # ─────────────────────────────────────────────
-#  HELPERS
+#  HELPERS & MIDDLEWARE
 # ─────────────────────────────────────────────
 
 def _get_clientes(cur):
@@ -41,6 +42,79 @@ def _get_equipos_select(cur):
     cur.execute("SELECT id_equipo, nombre_equipo FROM equipo ORDER BY nombre_equipo")
     return cur.fetchall()
 
+@app.before_request
+def load_logged_in_user():
+    user_id = session.get('user_id')
+    if user_id is None:
+        g.user = None
+    else:
+        conn = obtener_conexion()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("SELECT * FROM usuario WHERE id_usuario = %s", (user_id,))
+        g.user = cur.fetchone()
+        cur.close()
+        conn.close()
+
+    # Protect routes globally except for auth and static
+    if request.endpoint and request.endpoint not in ('login', 'static') and g.user is None:
+        return redirect(url_for('login'))
+
+def login_required(view):
+    @wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None:
+            return redirect(url_for('login'))
+        return view(**kwargs)
+    return wrapped_view
+
+@app.context_processor
+def inject_user():
+    return dict(current_user=g.user)
+
+# ─────────────────────────────────────────────
+#  AUTENTICACIÓN
+# ─────────────────────────────────────────────
+
+@app.route('/login', methods=('GET', 'POST'))
+def login():
+    if request.method == 'POST':
+        usuario = request.form['usuario']
+        contrasena = request.form['contrasena']
+        conn = obtener_conexion()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        error = None
+        
+        if not usuario:
+            error = 'El usuario es requerido.'
+        elif not contrasena:
+            error = 'La contraseña es requerida.'
+        else:
+            cur.execute("SELECT * FROM usuario WHERE usuario = %s", (usuario,))
+            user = cur.fetchone()
+            
+            if user is None:
+                error = 'Usuario incorrecto.'
+            elif user['contrasena'] != contrasena:
+                error = 'Contraseña incorrecta.'
+            elif not user['activo']:
+                error = 'La cuenta está desactivada.'
+                
+        cur.close()
+        conn.close()
+        
+        if error is None:
+            session.clear()
+            session['user_id'] = user['id_usuario']
+            return redirect(url_for('index'))
+            
+        flash(error, 'danger')
+        
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
 
 # ─────────────────────────────────────────────
 #  RUTA RAÍZ
@@ -757,7 +831,7 @@ def actualizar_tarea(id_tarea):
 
 @app.route('/tareas/<int:id_tarea>/comentar', methods=['POST'])
 def agregar_comentario(id_tarea):
-    id_usuario = request.form.get('id_usuario') or 1
+    id_usuario = g.user['id_usuario']
     contenido = request.form.get('contenido', '').strip()
     if not contenido:
         flash('El comentario no puede estar vacío.', 'warning')
@@ -996,6 +1070,8 @@ def nuevo_usuario():
 def crear_usuario():
     nombre = request.form.get('nombre', '').strip()
     email = request.form.get('email', '').strip()
+    usuario_val = request.form.get('usuario', '').strip() or None
+    contrasena_val = request.form.get('contrasena', '').strip() or None
     rol = request.form.get('rol', '').strip()
     id_equipo = request.form.get('id_equipo') or None
     costo_hora = request.form.get('costo_hora', 0)
@@ -1008,9 +1084,9 @@ def crear_usuario():
         conn = obtener_conexion()
         cur = conn.cursor()
         cur.execute("""
-            INSERT INTO usuario (nombre, email, rol, id_equipo, costo_hora, activo)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """, (nombre, email, rol, id_equipo, costo_hora, activo))
+            INSERT INTO usuario (nombre, email, usuario, contrasena, rol, id_equipo, costo_hora, activo)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """, (nombre, email, usuario_val, contrasena_val, rol, id_equipo, costo_hora, activo))
         conn.commit()
         cur.close()
         conn.close()
@@ -1042,6 +1118,8 @@ def editar_usuario(id_usuario):
 def actualizar_usuario(id_usuario):
     nombre = request.form.get('nombre', '').strip()
     email = request.form.get('email', '').strip()
+    usuario_val = request.form.get('usuario', '').strip() or None
+    contrasena_val = request.form.get('contrasena', '').strip() or None
     rol = request.form.get('rol', '').strip()
     id_equipo = request.form.get('id_equipo') or None
     costo_hora = request.form.get('costo_hora', 0)
@@ -1054,9 +1132,9 @@ def actualizar_usuario(id_usuario):
         conn = obtener_conexion()
         cur = conn.cursor()
         cur.execute("""
-            UPDATE usuario SET nombre=%s, email=%s, rol=%s, id_equipo=%s, costo_hora=%s, activo=%s
+            UPDATE usuario SET nombre=%s, email=%s, usuario=%s, contrasena=%s, rol=%s, id_equipo=%s, costo_hora=%s, activo=%s
             WHERE id_usuario=%s
-        """, (nombre, email, rol, id_equipo, costo_hora, activo, id_usuario))
+        """, (nombre, email, usuario_val, contrasena_val, rol, id_equipo, costo_hora, activo, id_usuario))
         conn.commit()
         cur.close()
         conn.close()
@@ -1216,12 +1294,12 @@ def eliminar_cliente(id_cliente):
 
 
 # ═══════════════════════════════════════════════
-#  F. CONFIGURACIÓN DE NOTIFICACIONES
+#  F. PERFIL DE USUARIO
 # ═══════════════════════════════════════════════
 
-@app.route('/configuracion', methods=['GET', 'POST'])
-def configuracion():
-    user_id = 1  # Usuario actual (Angel Aguilera - Líder de Proyecto)
+@app.route('/perfil', methods=['GET', 'POST'])
+def perfil():
+    user_id = g.user['id_usuario']
     conn = obtener_conexion()
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
@@ -1254,9 +1332,21 @@ def configuracion():
     cur.execute("SELECT * FROM usuario WHERE id_usuario = %s", (user_id,))
     usuario_actual = cur.fetchone()
 
+    # Get user tasks
+    cur.execute("""
+        SELECT t.*, p.nombre_proyecto, h.nombre_hito
+        FROM tarea t
+        JOIN proyecto p ON t.id_proyecto = p.id_proyecto
+        LEFT JOIN hito h ON t.id_hito = h.id_hito
+        WHERE t.id_usuario_asignado = %s
+        ORDER BY t.prioridad DESC, t.fecha_vencimiento ASC
+    """, (user_id,))
+    tareas_usuario = cur.fetchall()
+
     cur.close()
     conn.close()
-    return render_template('configuracion/index.html', config=config, usuario=usuario_actual, active_tab='configuracion')
+    return render_template('perfil/index.html', config=config, usuario=usuario_actual, tareas=tareas_usuario, active_tab='perfil')
+
 
 
 # ═══════════════════════════════════════════════

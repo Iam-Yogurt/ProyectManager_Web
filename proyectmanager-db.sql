@@ -2,13 +2,15 @@
 -- PostgreSQL database dump
 --
 
+\restrict dpIS0xWW3Mc9xefLWVygCYdsPtaxOHwc17HvVJn2uUpYD506D1jbBXp7kBjBjNU
 
--- Dumped from database version 18.6 (6569466)
--- Dumped by pg_dump version 18.6 (Ubuntu 18.6-0ubuntu0.26.04.1)
+-- Dumped from database version 18.6
+-- Dumped by pg_dump version 18.6
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -18,7 +20,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: fn_calcular_avance_proyecto(integer); Type: FUNCTION; Schema: public; Owner: -
+-- Name: fn_calcular_avance_proyecto(integer); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
 CREATE FUNCTION public.fn_calcular_avance_proyecto(p_id_proyecto integer) RETURNS numeric
@@ -45,8 +47,10 @@ END;
 $$;
 
 
+ALTER FUNCTION public.fn_calcular_avance_proyecto(p_id_proyecto integer) OWNER TO postgres;
+
 --
--- Name: fn_log_cambio_estado_tarea(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: fn_log_cambio_estado_tarea(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
 CREATE FUNCTION public.fn_log_cambio_estado_tarea() RETURNS trigger
@@ -62,12 +66,14 @@ END;
 $$;
 
 
+ALTER FUNCTION public.fn_log_cambio_estado_tarea() OWNER TO postgres;
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
 
 --
--- Name: cliente; Type: TABLE; Schema: public; Owner: -
+-- Name: cliente; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.cliente (
@@ -79,8 +85,10 @@ CREATE TABLE public.cliente (
 );
 
 
+ALTER TABLE public.cliente OWNER TO postgres;
+
 --
--- Name: cliente_id_cliente_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: cliente_id_cliente_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.cliente_id_cliente_seq
@@ -92,15 +100,17 @@ CREATE SEQUENCE public.cliente_id_cliente_seq
     CACHE 1;
 
 
+ALTER SEQUENCE public.cliente_id_cliente_seq OWNER TO postgres;
+
 --
--- Name: cliente_id_cliente_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: cliente_id_cliente_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.cliente_id_cliente_seq OWNED BY public.cliente.id_cliente;
 
 
 --
--- Name: comentario; Type: TABLE; Schema: public; Owner: -
+-- Name: comentario; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.comentario (
@@ -112,8 +122,10 @@ CREATE TABLE public.comentario (
 );
 
 
+ALTER TABLE public.comentario OWNER TO postgres;
+
 --
--- Name: comentario_id_comentario_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: comentario_id_comentario_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.comentario_id_comentario_seq
@@ -125,15 +137,17 @@ CREATE SEQUENCE public.comentario_id_comentario_seq
     CACHE 1;
 
 
+ALTER SEQUENCE public.comentario_id_comentario_seq OWNER TO postgres;
+
 --
--- Name: comentario_id_comentario_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: comentario_id_comentario_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.comentario_id_comentario_seq OWNED BY public.comentario.id_comentario;
 
 
 --
--- Name: config_notificacion; Type: TABLE; Schema: public; Owner: -
+-- Name: config_notificacion; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.config_notificacion (
@@ -144,8 +158,10 @@ CREATE TABLE public.config_notificacion (
 );
 
 
+ALTER TABLE public.config_notificacion OWNER TO postgres;
+
 --
--- Name: config_notificacion_id_config_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: config_notificacion_id_config_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.config_notificacion_id_config_seq
@@ -157,15 +173,17 @@ CREATE SEQUENCE public.config_notificacion_id_config_seq
     CACHE 1;
 
 
+ALTER SEQUENCE public.config_notificacion_id_config_seq OWNER TO postgres;
+
 --
--- Name: config_notificacion_id_config_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: config_notificacion_id_config_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.config_notificacion_id_config_seq OWNED BY public.config_notificacion.id_config;
 
 
 --
--- Name: dependencia_tarea; Type: TABLE; Schema: public; Owner: -
+-- Name: dependencia_tarea; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.dependencia_tarea (
@@ -176,8 +194,10 @@ CREATE TABLE public.dependencia_tarea (
 );
 
 
+ALTER TABLE public.dependencia_tarea OWNER TO postgres;
+
 --
--- Name: dependencia_tarea_id_dependencia_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: dependencia_tarea_id_dependencia_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.dependencia_tarea_id_dependencia_seq
@@ -189,15 +209,17 @@ CREATE SEQUENCE public.dependencia_tarea_id_dependencia_seq
     CACHE 1;
 
 
+ALTER SEQUENCE public.dependencia_tarea_id_dependencia_seq OWNER TO postgres;
+
 --
--- Name: dependencia_tarea_id_dependencia_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: dependencia_tarea_id_dependencia_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.dependencia_tarea_id_dependencia_seq OWNED BY public.dependencia_tarea.id_dependencia;
 
 
 --
--- Name: equipo; Type: TABLE; Schema: public; Owner: -
+-- Name: equipo; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.equipo (
@@ -207,8 +229,10 @@ CREATE TABLE public.equipo (
 );
 
 
+ALTER TABLE public.equipo OWNER TO postgres;
+
 --
--- Name: equipo_id_equipo_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: equipo_id_equipo_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.equipo_id_equipo_seq
@@ -220,15 +244,17 @@ CREATE SEQUENCE public.equipo_id_equipo_seq
     CACHE 1;
 
 
+ALTER SEQUENCE public.equipo_id_equipo_seq OWNER TO postgres;
+
 --
--- Name: equipo_id_equipo_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: equipo_id_equipo_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.equipo_id_equipo_seq OWNED BY public.equipo.id_equipo;
 
 
 --
--- Name: habilidad; Type: TABLE; Schema: public; Owner: -
+-- Name: habilidad; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.habilidad (
@@ -237,8 +263,10 @@ CREATE TABLE public.habilidad (
 );
 
 
+ALTER TABLE public.habilidad OWNER TO postgres;
+
 --
--- Name: habilidad_id_habilidad_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: habilidad_id_habilidad_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.habilidad_id_habilidad_seq
@@ -250,15 +278,17 @@ CREATE SEQUENCE public.habilidad_id_habilidad_seq
     CACHE 1;
 
 
+ALTER SEQUENCE public.habilidad_id_habilidad_seq OWNER TO postgres;
+
 --
--- Name: habilidad_id_habilidad_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: habilidad_id_habilidad_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.habilidad_id_habilidad_seq OWNED BY public.habilidad.id_habilidad;
 
 
 --
--- Name: habilidad_usuario; Type: TABLE; Schema: public; Owner: -
+-- Name: habilidad_usuario; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.habilidad_usuario (
@@ -268,8 +298,10 @@ CREATE TABLE public.habilidad_usuario (
 );
 
 
+ALTER TABLE public.habilidad_usuario OWNER TO postgres;
+
 --
--- Name: habilidad_usuario_id_habilidad_usuario_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: habilidad_usuario_id_habilidad_usuario_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.habilidad_usuario_id_habilidad_usuario_seq
@@ -281,15 +313,17 @@ CREATE SEQUENCE public.habilidad_usuario_id_habilidad_usuario_seq
     CACHE 1;
 
 
+ALTER SEQUENCE public.habilidad_usuario_id_habilidad_usuario_seq OWNER TO postgres;
+
 --
--- Name: habilidad_usuario_id_habilidad_usuario_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: habilidad_usuario_id_habilidad_usuario_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.habilidad_usuario_id_habilidad_usuario_seq OWNED BY public.habilidad_usuario.id_habilidad_usuario;
 
 
 --
--- Name: historial_cambio; Type: TABLE; Schema: public; Owner: -
+-- Name: historial_cambio; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.historial_cambio (
@@ -302,8 +336,10 @@ CREATE TABLE public.historial_cambio (
 );
 
 
+ALTER TABLE public.historial_cambio OWNER TO postgres;
+
 --
--- Name: historial_cambio_id_historial_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: historial_cambio_id_historial_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.historial_cambio_id_historial_seq
@@ -315,15 +351,17 @@ CREATE SEQUENCE public.historial_cambio_id_historial_seq
     CACHE 1;
 
 
+ALTER SEQUENCE public.historial_cambio_id_historial_seq OWNER TO postgres;
+
 --
--- Name: historial_cambio_id_historial_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: historial_cambio_id_historial_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.historial_cambio_id_historial_seq OWNED BY public.historial_cambio.id_historial;
 
 
 --
--- Name: hito; Type: TABLE; Schema: public; Owner: -
+-- Name: hito; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.hito (
@@ -335,8 +373,10 @@ CREATE TABLE public.hito (
 );
 
 
+ALTER TABLE public.hito OWNER TO postgres;
+
 --
--- Name: hito_id_hito_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: hito_id_hito_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.hito_id_hito_seq
@@ -348,15 +388,17 @@ CREATE SEQUENCE public.hito_id_hito_seq
     CACHE 1;
 
 
+ALTER SEQUENCE public.hito_id_hito_seq OWNER TO postgres;
+
 --
--- Name: hito_id_hito_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: hito_id_hito_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.hito_id_hito_seq OWNED BY public.hito.id_hito;
 
 
 --
--- Name: notificacion; Type: TABLE; Schema: public; Owner: -
+-- Name: notificacion; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.notificacion (
@@ -368,8 +410,10 @@ CREATE TABLE public.notificacion (
 );
 
 
+ALTER TABLE public.notificacion OWNER TO postgres;
+
 --
--- Name: notificacion_id_notificacion_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: notificacion_id_notificacion_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.notificacion_id_notificacion_seq
@@ -381,15 +425,17 @@ CREATE SEQUENCE public.notificacion_id_notificacion_seq
     CACHE 1;
 
 
+ALTER SEQUENCE public.notificacion_id_notificacion_seq OWNER TO postgres;
+
 --
--- Name: notificacion_id_notificacion_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: notificacion_id_notificacion_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.notificacion_id_notificacion_seq OWNED BY public.notificacion.id_notificacion;
 
 
 --
--- Name: proyecto; Type: TABLE; Schema: public; Owner: -
+-- Name: proyecto; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.proyecto (
@@ -408,8 +454,10 @@ CREATE TABLE public.proyecto (
 );
 
 
+ALTER TABLE public.proyecto OWNER TO postgres;
+
 --
--- Name: proyecto_id_proyecto_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: proyecto_id_proyecto_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.proyecto_id_proyecto_seq
@@ -421,15 +469,17 @@ CREATE SEQUENCE public.proyecto_id_proyecto_seq
     CACHE 1;
 
 
+ALTER SEQUENCE public.proyecto_id_proyecto_seq OWNER TO postgres;
+
 --
--- Name: proyecto_id_proyecto_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: proyecto_id_proyecto_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.proyecto_id_proyecto_seq OWNED BY public.proyecto.id_proyecto;
 
 
 --
--- Name: tarea; Type: TABLE; Schema: public; Owner: -
+-- Name: tarea; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.tarea (
@@ -452,8 +502,10 @@ CREATE TABLE public.tarea (
 );
 
 
+ALTER TABLE public.tarea OWNER TO postgres;
+
 --
--- Name: tarea_id_tarea_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: tarea_id_tarea_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.tarea_id_tarea_seq
@@ -465,15 +517,17 @@ CREATE SEQUENCE public.tarea_id_tarea_seq
     CACHE 1;
 
 
+ALTER SEQUENCE public.tarea_id_tarea_seq OWNER TO postgres;
+
 --
--- Name: tarea_id_tarea_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: tarea_id_tarea_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.tarea_id_tarea_seq OWNED BY public.tarea.id_tarea;
 
 
 --
--- Name: usuario; Type: TABLE; Schema: public; Owner: -
+-- Name: usuario; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.usuario (
@@ -484,13 +538,17 @@ CREATE TABLE public.usuario (
     rol character varying(30) NOT NULL,
     costo_hora numeric(10,2) DEFAULT 0.00 NOT NULL,
     activo boolean DEFAULT true,
+    usuario character varying(50),
+    contrasena character varying(255),
     CONSTRAINT usuario_costo_hora_check CHECK ((costo_hora >= (0)::numeric)),
     CONSTRAINT usuario_rol_check CHECK (((rol)::text = ANY (ARRAY[('desarrollador'::character varying)::text, ('diseñador'::character varying)::text, ('analista'::character varying)::text, ('líder_proyecto'::character varying)::text, ('administrador'::character varying)::text])))
 );
 
 
+ALTER TABLE public.usuario OWNER TO postgres;
+
 --
--- Name: usuario_id_usuario_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: usuario_id_usuario_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.usuario_id_usuario_seq
@@ -502,15 +560,17 @@ CREATE SEQUENCE public.usuario_id_usuario_seq
     CACHE 1;
 
 
+ALTER SEQUENCE public.usuario_id_usuario_seq OWNER TO postgres;
+
 --
--- Name: usuario_id_usuario_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: usuario_id_usuario_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.usuario_id_usuario_seq OWNED BY public.usuario.id_usuario;
 
 
 --
--- Name: vw_carga_usuarios; Type: VIEW; Schema: public; Owner: -
+-- Name: vw_carga_usuarios; Type: VIEW; Schema: public; Owner: postgres
 --
 
 CREATE VIEW public.vw_carga_usuarios AS
@@ -527,8 +587,10 @@ CREATE VIEW public.vw_carga_usuarios AS
   GROUP BY u.id_usuario, u.nombre, u.rol, eq.nombre_equipo;
 
 
+ALTER VIEW public.vw_carga_usuarios OWNER TO postgres;
+
 --
--- Name: vw_presupuesto_proyecto; Type: VIEW; Schema: public; Owner: -
+-- Name: vw_presupuesto_proyecto; Type: VIEW; Schema: public; Owner: postgres
 --
 
 CREATE VIEW public.vw_presupuesto_proyecto AS
@@ -543,8 +605,10 @@ CREATE VIEW public.vw_presupuesto_proyecto AS
   GROUP BY p.id_proyecto, p.nombre_proyecto, p.presupuesto_total;
 
 
+ALTER VIEW public.vw_presupuesto_proyecto OWNER TO postgres;
+
 --
--- Name: vw_proyectos_en_riesgo; Type: VIEW; Schema: public; Owner: -
+-- Name: vw_proyectos_en_riesgo; Type: VIEW; Schema: public; Owner: postgres
 --
 
 CREATE VIEW public.vw_proyectos_en_riesgo AS
@@ -575,325 +639,356 @@ CREATE VIEW public.vw_proyectos_en_riesgo AS
      LEFT JOIN estadisticas_tareas et ON ((p.id_proyecto = et.id_proyecto)));
 
 
+ALTER VIEW public.vw_proyectos_en_riesgo OWNER TO postgres;
+
 --
--- Name: cliente id_cliente; Type: DEFAULT; Schema: public; Owner: -
+-- Name: cliente id_cliente; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.cliente ALTER COLUMN id_cliente SET DEFAULT nextval('public.cliente_id_cliente_seq'::regclass);
 
 
 --
--- Name: comentario id_comentario; Type: DEFAULT; Schema: public; Owner: -
+-- Name: comentario id_comentario; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.comentario ALTER COLUMN id_comentario SET DEFAULT nextval('public.comentario_id_comentario_seq'::regclass);
 
 
 --
--- Name: config_notificacion id_config; Type: DEFAULT; Schema: public; Owner: -
+-- Name: config_notificacion id_config; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.config_notificacion ALTER COLUMN id_config SET DEFAULT nextval('public.config_notificacion_id_config_seq'::regclass);
 
 
 --
--- Name: dependencia_tarea id_dependencia; Type: DEFAULT; Schema: public; Owner: -
+-- Name: dependencia_tarea id_dependencia; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.dependencia_tarea ALTER COLUMN id_dependencia SET DEFAULT nextval('public.dependencia_tarea_id_dependencia_seq'::regclass);
 
 
 --
--- Name: equipo id_equipo; Type: DEFAULT; Schema: public; Owner: -
+-- Name: equipo id_equipo; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.equipo ALTER COLUMN id_equipo SET DEFAULT nextval('public.equipo_id_equipo_seq'::regclass);
 
 
 --
--- Name: habilidad id_habilidad; Type: DEFAULT; Schema: public; Owner: -
+-- Name: habilidad id_habilidad; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.habilidad ALTER COLUMN id_habilidad SET DEFAULT nextval('public.habilidad_id_habilidad_seq'::regclass);
 
 
 --
--- Name: habilidad_usuario id_habilidad_usuario; Type: DEFAULT; Schema: public; Owner: -
+-- Name: habilidad_usuario id_habilidad_usuario; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.habilidad_usuario ALTER COLUMN id_habilidad_usuario SET DEFAULT nextval('public.habilidad_usuario_id_habilidad_usuario_seq'::regclass);
 
 
 --
--- Name: historial_cambio id_historial; Type: DEFAULT; Schema: public; Owner: -
+-- Name: historial_cambio id_historial; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.historial_cambio ALTER COLUMN id_historial SET DEFAULT nextval('public.historial_cambio_id_historial_seq'::regclass);
 
 
 --
--- Name: hito id_hito; Type: DEFAULT; Schema: public; Owner: -
+-- Name: hito id_hito; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.hito ALTER COLUMN id_hito SET DEFAULT nextval('public.hito_id_hito_seq'::regclass);
 
 
 --
--- Name: notificacion id_notificacion; Type: DEFAULT; Schema: public; Owner: -
+-- Name: notificacion id_notificacion; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.notificacion ALTER COLUMN id_notificacion SET DEFAULT nextval('public.notificacion_id_notificacion_seq'::regclass);
 
 
 --
--- Name: proyecto id_proyecto; Type: DEFAULT; Schema: public; Owner: -
+-- Name: proyecto id_proyecto; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.proyecto ALTER COLUMN id_proyecto SET DEFAULT nextval('public.proyecto_id_proyecto_seq'::regclass);
 
 
 --
--- Name: tarea id_tarea; Type: DEFAULT; Schema: public; Owner: -
+-- Name: tarea id_tarea; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.tarea ALTER COLUMN id_tarea SET DEFAULT nextval('public.tarea_id_tarea_seq'::regclass);
 
 
 --
--- Name: usuario id_usuario; Type: DEFAULT; Schema: public; Owner: -
+-- Name: usuario id_usuario; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.usuario ALTER COLUMN id_usuario SET DEFAULT nextval('public.usuario_id_usuario_seq'::regclass);
 
 
 --
--- Data for Name: cliente; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: cliente; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.cliente VALUES (1, 'TechSolutions C.A.', 'Carlos Mendoza', 'cmendoza@techsolutions.com', '+584141234567');
-INSERT INTO public.cliente VALUES (2, 'Banco Global', 'Mariana López', 'mlopez@bancoglobal.com', '+584129876543');
-INSERT INTO public.cliente VALUES (3, 'Logística Express', 'Roberto Gómez', 'rgomez@logisticaexp.com', '+584165554433');
-
-
---
--- Data for Name: comentario; Type: TABLE DATA; Schema: public; Owner: -
---
-
-INSERT INTO public.comentario VALUES (1, 1, 4, 'Maquetas completadas y aprobadas por el cliente.', '2026-09-23 09:57:06.558408');
-INSERT INTO public.comentario VALUES (2, 2, 3, 'Estructura de tablas DDL ejecutada con éxito en el servidor de pruebas.', '2026-09-23 09:57:06.558408');
-INSERT INTO public.comentario VALUES (3, 5, 5, 'Esperando credenciales de acceso para entorno de pruebas.', '2026-09-23 09:57:06.558408');
+COPY public.cliente (id_cliente, nombre_empresa, persona_contacto, email_contacto, telefono) FROM stdin;
+1	TechSolutions C.A.	Carlos Mendoza	cmendoza@techsolutions.com	+584141234567
+2	Banco Global	Mariana López	mlopez@bancoglobal.com	+584129876543
+3	Logística Express	Roberto Gómez	rgomez@logisticaexp.com	+584165554433
+4	VEO STREAM	Miguel Lopez	miguelopez79@example.com	04123658942
+\.
 
 
 --
--- Data for Name: config_notificacion; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: comentario; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.config_notificacion VALUES (1, 1, true, true);
-INSERT INTO public.config_notificacion VALUES (2, 2, true, true);
-INSERT INTO public.config_notificacion VALUES (3, 3, true, true);
-INSERT INTO public.config_notificacion VALUES (4, 4, false, true);
-INSERT INTO public.config_notificacion VALUES (5, 5, true, false);
-INSERT INTO public.config_notificacion VALUES (6, 6, true, true);
-
-
---
--- Data for Name: dependencia_tarea; Type: TABLE DATA; Schema: public; Owner: -
---
-
-INSERT INTO public.dependencia_tarea VALUES (1, 2, 3);
-INSERT INTO public.dependencia_tarea VALUES (2, 2, 4);
+COPY public.comentario (id_comentario, id_tarea, id_usuario, contenido, fecha_hora) FROM stdin;
+1	1	4	Maquetas completadas y aprobadas por el cliente.	2026-09-23 09:57:06.558408
+2	2	3	Estructura de tablas DDL ejecutada con éxito en el servidor de pruebas.	2026-09-23 09:57:06.558408
+3	5	5	Esperando credenciales de acceso para entorno de pruebas.	2026-09-23 09:57:06.558408
+\.
 
 
 --
--- Data for Name: equipo; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: config_notificacion; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.equipo VALUES (1, 'Frontend', 'Desarrollo de interfaces de usuario y experiencia cliente');
-INSERT INTO public.equipo VALUES (2, 'Backend', 'Desarrollo de APIs, lógica de negocio y arquitectura de datos');
-INSERT INTO public.equipo VALUES (3, 'QA / Pruebas', 'Aseguramiento de calidad, pruebas unitarias e integración');
-INSERT INTO public.equipo VALUES (4, 'Diseño UX/UI', 'Diseño visual, maquetación y prototipado');
-
-
---
--- Data for Name: habilidad; Type: TABLE DATA; Schema: public; Owner: -
---
-
-INSERT INTO public.habilidad VALUES (1, 'React');
-INSERT INTO public.habilidad VALUES (2, 'PostgreSQL');
-INSERT INTO public.habilidad VALUES (3, 'Python');
-INSERT INTO public.habilidad VALUES (4, 'Java');
-INSERT INTO public.habilidad VALUES (5, 'Figma');
-INSERT INTO public.habilidad VALUES (6, 'QA Automation');
-INSERT INTO public.habilidad VALUES (7, 'Docker');
+COPY public.config_notificacion (id_config, id_usuario, recibir_emails, alerta_vencimiento) FROM stdin;
+1	1	t	t
+2	2	t	t
+3	3	t	t
+4	4	f	t
+5	5	t	f
+\.
 
 
 --
--- Data for Name: habilidad_usuario; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: dependencia_tarea; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.habilidad_usuario VALUES (1, 1, 2);
-INSERT INTO public.habilidad_usuario VALUES (2, 1, 3);
-INSERT INTO public.habilidad_usuario VALUES (3, 2, 1);
-INSERT INTO public.habilidad_usuario VALUES (4, 3, 2);
-INSERT INTO public.habilidad_usuario VALUES (5, 3, 4);
-INSERT INTO public.habilidad_usuario VALUES (6, 4, 5);
-INSERT INTO public.habilidad_usuario VALUES (7, 5, 6);
+COPY public.dependencia_tarea (id_dependencia, id_tarea_principal, id_tarea_dependiente) FROM stdin;
+1	2	3
+2	2	4
+\.
 
 
 --
--- Data for Name: historial_cambio; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: equipo; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.historial_cambio VALUES (1, 1, 4, 'en_progreso', 'completada', '2026-09-23 09:57:06.561214');
-INSERT INTO public.historial_cambio VALUES (2, 2, 3, 'en_progreso', 'completada', '2026-09-23 09:57:06.561214');
-INSERT INTO public.historial_cambio VALUES (3, 5, 5, 'pendiente', 'bloqueada', '2026-09-23 09:57:06.561214');
-INSERT INTO public.historial_cambio VALUES (4, 3, 2, 'en_progreso', 'completada', '2026-09-23 10:06:05.170675');
-INSERT INTO public.historial_cambio VALUES (5, 1, 4, 'completada', 'en_progreso', '2026-09-23 11:33:34.439739');
-
-
---
--- Data for Name: hito; Type: TABLE DATA; Schema: public; Owner: -
---
-
-INSERT INTO public.hito VALUES (1, 1, 'Aprobación de Prototipos UX', '2026-02-15', true);
-INSERT INTO public.hito VALUES (2, 1, 'Lanzamiento Alfa / Backend listo', '2026-04-30', false);
-INSERT INTO public.hito VALUES (3, 2, 'Integración de API de Pagos', '2026-03-31', false);
+COPY public.equipo (id_equipo, nombre_equipo, descripcion) FROM stdin;
+1	Frontend	Desarrollo de interfaces de usuario y experiencia cliente
+2	Backend	Desarrollo de APIs, lógica de negocio y arquitectura de datos
+3	QA / Pruebas	Aseguramiento de calidad, pruebas unitarias e integración
+4	Diseño UX/UI	Diseño visual, maquetación y prototipado
+\.
 
 
 --
--- Data for Name: notificacion; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: habilidad; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.notificacion VALUES (1, 1, 'El proyecto Sistema ERP Web ha completado el Hito 1.', '2026-09-23 09:57:06.56362', true);
-INSERT INTO public.notificacion VALUES (2, 5, 'La tarea Pruebas de Seguridad API se encuentra bloqueada.', '2026-09-23 09:57:06.56362', false);
-
-
---
--- Data for Name: proyecto; Type: TABLE DATA; Schema: public; Owner: -
---
-
-INSERT INTO public.proyecto VALUES (1, 1, 1, 'Sistema ERP Web', 'Desarrollo de sistema web de gestión de recursos empresariales', '2026-01-15', '2026-06-30', NULL, 15000.00, 'en_desarrollo');
-INSERT INTO public.proyecto VALUES (2, 2, 1, 'App Banca Móvil', 'Rediseño e integración de API para aplicación bancaria', '2026-02-01', '2026-05-15', NULL, 20000.00, 'en_desarrollo');
-INSERT INTO public.proyecto VALUES (3, 3, 1, 'Migración de Base de Datos', 'Migración de datos antiguos hacia esquema optimizado PostgreSQL', '2026-03-01', '2026-04-15', NULL, 5000.00, 'planificacion');
-INSERT INTO public.proyecto VALUES (4, 1, 1, 'Sistema Movil', NULL, '2026-10-01', '2026-12-31', NULL, 5000.00, 'planificacion');
+COPY public.habilidad (id_habilidad, nombre_habilidad) FROM stdin;
+1	React
+2	PostgreSQL
+3	Python
+4	Java
+5	Figma
+6	QA Automation
+7	Docker
+\.
 
 
 --
--- Data for Name: tarea; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: habilidad_usuario; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.tarea VALUES (2, 1, 2, 3, 'Crear Tablas PostgreSQL', 'Implementación de scripts DDL y triggers base', '2026-09-23 09:56:43.920483', '2026-03-05 18:00:00', 'alta', 'completada', 15.00, 14.00);
-INSERT INTO public.tarea VALUES (4, 1, 2, 3, 'API Endpoint Usuarios', 'Endpoints REST para CRUD de usuarios', '2026-09-23 09:56:43.920483', '2026-03-12 18:00:00', 'alta', 'en_progreso', 12.00, 8.00);
-INSERT INTO public.tarea VALUES (5, 2, 3, 5, 'Pruebas de Seguridad API', 'Pruebas de penetración y rendimiento', '2026-09-23 09:56:43.920483', '2026-03-01 18:00:00', 'alta', 'bloqueada', 25.00, 5.00);
-INSERT INTO public.tarea VALUES (1, 1, 1, 4, 'Diseñar Maquetas UI', 'Diseño de pantallas principales en Figma', '2026-09-23 09:56:43.920483', '2026-02-10 18:00:00', 'alta', 'en_progreso', 20.00, 10.00);
-INSERT INTO public.tarea VALUES (3, 1, 2, 2, 'Desarrollar Login Frontend', 'Pantalla de autenticación y consumo de JWT', '2026-09-23 09:56:43.920483', '2026-03-10 18:00:00', 'media', 'completada', 10.00, 15.00);
-
-
---
--- Data for Name: usuario; Type: TABLE DATA; Schema: public; Owner: -
---
-
-INSERT INTO public.usuario VALUES (1, 1, 'Angel Aguilera', 'angel@empresa.com', 'líder_proyecto', 25.00, true);
-INSERT INTO public.usuario VALUES (2, 1, 'María Pérez', 'maria@empresa.com', 'desarrollador', 18.00, true);
-INSERT INTO public.usuario VALUES (3, 2, 'José Rodríguez', 'jose@empresa.com', 'desarrollador', 20.00, true);
-INSERT INTO public.usuario VALUES (4, 4, 'Sofia Gómez', 'sofia@empresa.com', 'diseñador', 15.00, true);
-INSERT INTO public.usuario VALUES (5, 3, 'Luis Fernández', 'luis@empresa.com', 'analista', 16.00, true);
-INSERT INTO public.usuario VALUES (6, 3, 'Elena Torres', 'elena@empresa.com', 'administrador', 30.00, true);
+COPY public.habilidad_usuario (id_habilidad_usuario, id_usuario, id_habilidad) FROM stdin;
+1	1	2
+2	1	3
+3	2	1
+4	3	2
+5	3	4
+6	4	5
+7	5	6
+\.
 
 
 --
--- Name: cliente_id_cliente_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Data for Name: historial_cambio; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.cliente_id_cliente_seq', 3, true);
+COPY public.historial_cambio (id_historial, id_tarea, id_usuario, estado_anterior, estado_nuevo, fecha_cambio) FROM stdin;
+1	1	4	en_progreso	completada	2026-09-23 09:57:06.561214
+2	2	3	en_progreso	completada	2026-09-23 09:57:06.561214
+3	5	5	pendiente	bloqueada	2026-09-23 09:57:06.561214
+4	3	2	en_progreso	completada	2026-09-23 10:06:05.170675
+5	1	4	completada	en_progreso	2026-09-23 11:33:34.439739
+6	6	4	pendiente	en_progreso	2026-09-26 01:49:11.157617
+\.
 
 
 --
--- Name: comentario_id_comentario_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Data for Name: hito; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.hito (id_hito, id_proyecto, nombre_hito, fecha_objetivo, alcanzado) FROM stdin;
+2	1	Lanzamiento Alfa / Backend listo	2026-04-30	f
+3	2	Integración de API de Pagos	2026-03-31	f
+1	1	Aprobación de Prototipos UX	2026-02-15	t
+4	5	Esquema realizado	2026-09-01	t
+\.
+
+
+--
+-- Data for Name: notificacion; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.notificacion (id_notificacion, id_usuario, mensaje, fecha_envio, leida) FROM stdin;
+1	1	El proyecto Sistema ERP Web ha completado el Hito 1.	2026-09-23 09:57:06.56362	t
+2	5	La tarea Pruebas de Seguridad API se encuentra bloqueada.	2026-09-23 09:57:06.56362	f
+\.
+
+
+--
+-- Data for Name: proyecto; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.proyecto (id_proyecto, id_cliente, id_lider, nombre_proyecto, descripcion, fecha_inicio, fecha_fin_estimada, fecha_fin_real, presupuesto_total, estado) FROM stdin;
+1	1	1	Sistema ERP Web	Desarrollo de sistema web de gestión de recursos empresariales	2026-01-15	2026-06-30	\N	15000.00	en_desarrollo
+3	3	1	Migración de Base de Datos	Migración de datos antiguos hacia esquema optimizado PostgreSQL	2026-03-01	2026-04-15	\N	5000.00	planificacion
+4	1	1	Sistema Movil	\N	2026-10-01	2026-12-31	\N	5000.00	planificacion
+2	2	1	App Banca Móvil	Rediseño e integración de API para aplicación bancaria	2026-02-10	2026-05-15	\N	20000.00	en_desarrollo
+5	4	3	Plataforma de streaming VEO	Plataforma de streaming catalogos de pelicula, series, zona kids	2026-01-13	2026-12-03	\N	20000.00	en_desarrollo
+\.
+
+
+--
+-- Data for Name: tarea; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.tarea (id_tarea, id_proyecto, id_hito, id_usuario_asignado, nombre_tarea, descripcion, fecha_creacion, fecha_vencimiento, prioridad, estado, tiempo_estimado_horas, tiempo_real_horas) FROM stdin;
+2	1	2	3	Crear Tablas PostgreSQL	Implementación de scripts DDL y triggers base	2026-09-23 09:56:43.920483	2026-03-05 18:00:00	alta	completada	15.00	14.00
+4	1	2	3	API Endpoint Usuarios	Endpoints REST para CRUD de usuarios	2026-09-23 09:56:43.920483	2026-03-12 18:00:00	alta	en_progreso	12.00	8.00
+5	2	3	5	Pruebas de Seguridad API	Pruebas de penetración y rendimiento	2026-09-23 09:56:43.920483	2026-03-01 18:00:00	alta	bloqueada	25.00	5.00
+1	1	1	4	Diseñar Maquetas UI	Diseño de pantallas principales en Figma	2026-09-23 09:56:43.920483	2026-02-10 18:00:00	alta	en_progreso	20.00	10.00
+3	1	2	2	Desarrollar Login Frontend	Pantalla de autenticación y consumo de JWT	2026-09-23 09:56:43.920483	2026-03-10 18:00:00	media	completada	10.00	15.00
+6	5	4	4	implementar zona kids	Intuitiva, colorida, catalogo entretenido	2026-09-26 01:48:19.545696	2026-10-15 00:50:00	alta	en_progreso	130.00	10.00
+\.
+
+
+--
+-- Data for Name: usuario; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.usuario (id_usuario, id_equipo, nombre, email, rol, costo_hora, activo, usuario, contrasena) FROM stdin;
+3	4	Genesis Sanchez	genesis@empresa.com	diseñador	20.00	t	Genesis	genesis123
+5	3	Luis Blanca	luis@empresa.com	analista	16.00	t	Luis	luis123
+2	1	Kendra Cabello	kendra@empresa.com	desarrollador	18.00	t	Kendra	kendra123
+4	2	Jose Abache	jose@empresa.com	administrador	15.00	t	Jose	jose123
+1	1	Angel Aguilera	angel@empresa.com	líder_proyecto	25.00	t	Angel	angel123
+\.
+
+
+--
+-- Name: cliente_id_cliente_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.cliente_id_cliente_seq', 4, true);
+
+
+--
+-- Name: comentario_id_comentario_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
 SELECT pg_catalog.setval('public.comentario_id_comentario_seq', 3, true);
 
 
 --
--- Name: config_notificacion_id_config_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: config_notificacion_id_config_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.config_notificacion_id_config_seq', 6, true);
+SELECT pg_catalog.setval('public.config_notificacion_id_config_seq', 8, true);
 
 
 --
--- Name: dependencia_tarea_id_dependencia_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: dependencia_tarea_id_dependencia_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
 SELECT pg_catalog.setval('public.dependencia_tarea_id_dependencia_seq', 2, true);
 
 
 --
--- Name: equipo_id_equipo_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: equipo_id_equipo_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
 SELECT pg_catalog.setval('public.equipo_id_equipo_seq', 4, true);
 
 
 --
--- Name: habilidad_id_habilidad_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: habilidad_id_habilidad_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
 SELECT pg_catalog.setval('public.habilidad_id_habilidad_seq', 7, true);
 
 
 --
--- Name: habilidad_usuario_id_habilidad_usuario_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: habilidad_usuario_id_habilidad_usuario_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
 SELECT pg_catalog.setval('public.habilidad_usuario_id_habilidad_usuario_seq', 7, true);
 
 
 --
--- Name: historial_cambio_id_historial_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: historial_cambio_id_historial_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.historial_cambio_id_historial_seq', 5, true);
-
-
---
--- Name: hito_id_hito_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('public.hito_id_hito_seq', 3, true);
+SELECT pg_catalog.setval('public.historial_cambio_id_historial_seq', 6, true);
 
 
 --
--- Name: notificacion_id_notificacion_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: hito_id_hito_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.hito_id_hito_seq', 4, true);
+
+
+--
+-- Name: notificacion_id_notificacion_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
 SELECT pg_catalog.setval('public.notificacion_id_notificacion_seq', 2, true);
 
 
 --
--- Name: proyecto_id_proyecto_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: proyecto_id_proyecto_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.proyecto_id_proyecto_seq', 4, true);
-
-
---
--- Name: tarea_id_tarea_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('public.tarea_id_tarea_seq', 5, true);
+SELECT pg_catalog.setval('public.proyecto_id_proyecto_seq', 5, true);
 
 
 --
--- Name: usuario_id_usuario_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: tarea_id_tarea_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.tarea_id_tarea_seq', 6, true);
+
+
+--
+-- Name: usuario_id_usuario_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
 SELECT pg_catalog.setval('public.usuario_id_usuario_seq', 6, true);
 
 
 --
--- Name: cliente cliente_email_contacto_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: cliente cliente_email_contacto_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.cliente
@@ -901,7 +996,7 @@ ALTER TABLE ONLY public.cliente
 
 
 --
--- Name: cliente cliente_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: cliente cliente_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.cliente
@@ -909,7 +1004,7 @@ ALTER TABLE ONLY public.cliente
 
 
 --
--- Name: comentario comentario_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: comentario comentario_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.comentario
@@ -917,7 +1012,7 @@ ALTER TABLE ONLY public.comentario
 
 
 --
--- Name: config_notificacion config_notificacion_id_usuario_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: config_notificacion config_notificacion_id_usuario_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.config_notificacion
@@ -925,7 +1020,7 @@ ALTER TABLE ONLY public.config_notificacion
 
 
 --
--- Name: config_notificacion config_notificacion_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: config_notificacion config_notificacion_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.config_notificacion
@@ -933,7 +1028,7 @@ ALTER TABLE ONLY public.config_notificacion
 
 
 --
--- Name: dependencia_tarea dependencia_tarea_id_tarea_principal_id_tarea_dependiente_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: dependencia_tarea dependencia_tarea_id_tarea_principal_id_tarea_dependiente_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.dependencia_tarea
@@ -941,7 +1036,7 @@ ALTER TABLE ONLY public.dependencia_tarea
 
 
 --
--- Name: dependencia_tarea dependencia_tarea_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: dependencia_tarea dependencia_tarea_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.dependencia_tarea
@@ -949,7 +1044,7 @@ ALTER TABLE ONLY public.dependencia_tarea
 
 
 --
--- Name: equipo equipo_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: equipo equipo_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.equipo
@@ -957,7 +1052,7 @@ ALTER TABLE ONLY public.equipo
 
 
 --
--- Name: habilidad habilidad_nombre_habilidad_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: habilidad habilidad_nombre_habilidad_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.habilidad
@@ -965,7 +1060,7 @@ ALTER TABLE ONLY public.habilidad
 
 
 --
--- Name: habilidad habilidad_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: habilidad habilidad_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.habilidad
@@ -973,7 +1068,7 @@ ALTER TABLE ONLY public.habilidad
 
 
 --
--- Name: habilidad_usuario habilidad_usuario_id_usuario_id_habilidad_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: habilidad_usuario habilidad_usuario_id_usuario_id_habilidad_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.habilidad_usuario
@@ -981,7 +1076,7 @@ ALTER TABLE ONLY public.habilidad_usuario
 
 
 --
--- Name: habilidad_usuario habilidad_usuario_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: habilidad_usuario habilidad_usuario_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.habilidad_usuario
@@ -989,7 +1084,7 @@ ALTER TABLE ONLY public.habilidad_usuario
 
 
 --
--- Name: historial_cambio historial_cambio_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: historial_cambio historial_cambio_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.historial_cambio
@@ -997,7 +1092,7 @@ ALTER TABLE ONLY public.historial_cambio
 
 
 --
--- Name: hito hito_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: hito hito_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.hito
@@ -1005,7 +1100,7 @@ ALTER TABLE ONLY public.hito
 
 
 --
--- Name: notificacion notificacion_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: notificacion notificacion_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.notificacion
@@ -1013,7 +1108,7 @@ ALTER TABLE ONLY public.notificacion
 
 
 --
--- Name: proyecto proyecto_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: proyecto proyecto_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.proyecto
@@ -1021,7 +1116,7 @@ ALTER TABLE ONLY public.proyecto
 
 
 --
--- Name: tarea tarea_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: tarea tarea_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.tarea
@@ -1029,7 +1124,7 @@ ALTER TABLE ONLY public.tarea
 
 
 --
--- Name: usuario usuario_email_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: usuario usuario_email_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.usuario
@@ -1037,7 +1132,7 @@ ALTER TABLE ONLY public.usuario
 
 
 --
--- Name: usuario usuario_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: usuario usuario_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.usuario
@@ -1045,14 +1140,14 @@ ALTER TABLE ONLY public.usuario
 
 
 --
--- Name: tarea trg_bitacora_tarea; Type: TRIGGER; Schema: public; Owner: -
+-- Name: tarea trg_bitacora_tarea; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
 CREATE TRIGGER trg_bitacora_tarea AFTER UPDATE ON public.tarea FOR EACH ROW EXECUTE FUNCTION public.fn_log_cambio_estado_tarea();
 
 
 --
--- Name: comentario comentario_id_tarea_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: comentario comentario_id_tarea_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.comentario
@@ -1060,7 +1155,7 @@ ALTER TABLE ONLY public.comentario
 
 
 --
--- Name: comentario comentario_id_usuario_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: comentario comentario_id_usuario_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.comentario
@@ -1068,7 +1163,7 @@ ALTER TABLE ONLY public.comentario
 
 
 --
--- Name: config_notificacion config_notificacion_id_usuario_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: config_notificacion config_notificacion_id_usuario_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.config_notificacion
@@ -1076,7 +1171,7 @@ ALTER TABLE ONLY public.config_notificacion
 
 
 --
--- Name: dependencia_tarea dependencia_tarea_id_tarea_dependiente_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: dependencia_tarea dependencia_tarea_id_tarea_dependiente_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.dependencia_tarea
@@ -1084,7 +1179,7 @@ ALTER TABLE ONLY public.dependencia_tarea
 
 
 --
--- Name: dependencia_tarea dependencia_tarea_id_tarea_principal_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: dependencia_tarea dependencia_tarea_id_tarea_principal_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.dependencia_tarea
@@ -1092,7 +1187,7 @@ ALTER TABLE ONLY public.dependencia_tarea
 
 
 --
--- Name: habilidad_usuario habilidad_usuario_id_habilidad_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: habilidad_usuario habilidad_usuario_id_habilidad_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.habilidad_usuario
@@ -1100,7 +1195,7 @@ ALTER TABLE ONLY public.habilidad_usuario
 
 
 --
--- Name: habilidad_usuario habilidad_usuario_id_usuario_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: habilidad_usuario habilidad_usuario_id_usuario_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.habilidad_usuario
@@ -1108,7 +1203,7 @@ ALTER TABLE ONLY public.habilidad_usuario
 
 
 --
--- Name: historial_cambio historial_cambio_id_tarea_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: historial_cambio historial_cambio_id_tarea_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.historial_cambio
@@ -1116,7 +1211,7 @@ ALTER TABLE ONLY public.historial_cambio
 
 
 --
--- Name: historial_cambio historial_cambio_id_usuario_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: historial_cambio historial_cambio_id_usuario_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.historial_cambio
@@ -1124,7 +1219,7 @@ ALTER TABLE ONLY public.historial_cambio
 
 
 --
--- Name: hito hito_id_proyecto_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: hito hito_id_proyecto_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.hito
@@ -1132,7 +1227,7 @@ ALTER TABLE ONLY public.hito
 
 
 --
--- Name: notificacion notificacion_id_usuario_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: notificacion notificacion_id_usuario_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.notificacion
@@ -1140,7 +1235,7 @@ ALTER TABLE ONLY public.notificacion
 
 
 --
--- Name: proyecto proyecto_id_cliente_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: proyecto proyecto_id_cliente_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.proyecto
@@ -1148,7 +1243,7 @@ ALTER TABLE ONLY public.proyecto
 
 
 --
--- Name: proyecto proyecto_id_lider_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: proyecto proyecto_id_lider_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.proyecto
@@ -1156,7 +1251,7 @@ ALTER TABLE ONLY public.proyecto
 
 
 --
--- Name: tarea tarea_id_hito_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: tarea tarea_id_hito_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.tarea
@@ -1164,7 +1259,7 @@ ALTER TABLE ONLY public.tarea
 
 
 --
--- Name: tarea tarea_id_proyecto_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: tarea tarea_id_proyecto_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.tarea
@@ -1172,7 +1267,7 @@ ALTER TABLE ONLY public.tarea
 
 
 --
--- Name: tarea tarea_id_usuario_asignado_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: tarea tarea_id_usuario_asignado_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.tarea
@@ -1180,7 +1275,7 @@ ALTER TABLE ONLY public.tarea
 
 
 --
--- Name: usuario usuario_id_equipo_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: usuario usuario_id_equipo_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.usuario
@@ -1191,4 +1286,5 @@ ALTER TABLE ONLY public.usuario
 -- PostgreSQL database dump complete
 --
 
+\unrestrict dpIS0xWW3Mc9xefLWVygCYdsPtaxOHwc17HvVJn2uUpYD506D1jbBXp7kBjBjNU
 

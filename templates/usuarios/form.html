@@ -38,6 +38,18 @@
         </div>
 
         <div class="form-group">
+          <label class="form-label">Usuario</label>
+          <input type="text" name="usuario" class="form-input"
+                 value="{{ usuario.usuario if usuario else '' }}" placeholder="Ej: mrodriguez">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Contraseña</label>
+          <input type="password" name="contrasena" class="form-input"
+                 value="{{ usuario.contrasena if usuario else '' }}" placeholder="Ingrese contraseña">
+        </div>
+
+        <div class="form-group">
           <label class="form-label">Rol en el Sistema <span class="req">*</span></label>
           <select name="rol" class="form-select" required>
             <option value="">-- Seleccione un Rol --</option>
