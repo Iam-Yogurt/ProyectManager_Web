@@ -35,7 +35,6 @@
               <th>Habilidades</th>
               <th>$/Hora</th>
               <th>Carga</th>
-              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -62,12 +61,9 @@
               </td>
               <td style="font-weight: 600;">${{ "%.2f"|format(m.costo_hora) }}/h</td>
               <td>{{ m.horas_pendientes }}h ({{ m.tareas_activas }} tareas)</td>
-              <td>
-                <a href="{{ url_for('editar_usuario', id_usuario=m.id_usuario) }}" class="btn btn-ghost btn-sm">✏️</a>
-              </td>
             </tr>
             {% else %}
-            <tr class="empty-row"><td colspan="6">No hay miembros asignados a este equipo.</td></tr>
+            <tr class="empty-row"><td colspan="5">No hay miembros asignados a este equipo.</td></tr>
             {% endfor %}
           </tbody>
         </table>

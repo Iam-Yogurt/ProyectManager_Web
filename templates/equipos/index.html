@@ -74,7 +74,6 @@
           <th>Tarifa / Hora</th>
           <th>Carga Activa</th>
           <th>Estado</th>
-          <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -118,18 +117,9 @@
             </span>
             {% endif %}
           </td>
-          <td>
-            <div class="btn-group">
-              <a href="{{ url_for('editar_usuario', id_usuario=u.id_usuario) }}" class="btn btn-ghost btn-sm" title="Editar">✏️</a>
-              <form action="{{ url_for('eliminar_usuario', id_usuario=u.id_usuario) }}" method="POST" style="display:inline;"
-                    onsubmit="return confirm('¿Eliminar este usuario?');">
-                <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">🗑️</button>
-              </form>
-            </div>
-          </td>
         </tr>
         {% else %}
-        <tr class="empty-row"><td colspan="8">No hay usuarios registrados.</td></tr>
+        <tr class="empty-row"><td colspan="7">No hay usuarios registrados.</td></tr>
         {% endfor %}
       </tbody>
     </table>

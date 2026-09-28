@@ -69,7 +69,29 @@ def login_required(view):
 
 @app.context_processor
 def inject_user():
-    return dict(current_user=g.user)
+    alertas = []
+    if g.user:
+        conn = obtener_conexion()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        # Check if user has active preference for alerts
+        cur.execute("SELECT alerta_vencimiento FROM config_notificacion WHERE id_usuario = %s", (g.user['id_usuario'],))
+        config = cur.fetchone()
+        if config and config['alerta_vencimiento']:
+            cur.execute("""
+                SELECT t.id_tarea, t.nombre_tarea, t.fecha_vencimiento, p.nombre_proyecto
+                FROM tarea t
+                LEFT JOIN hito h ON t.id_hito = h.id_hito
+                LEFT JOIN proyecto p ON h.id_proyecto = p.id_proyecto
+                WHERE t.id_usuario_asignado = %s
+                  AND t.estado != 'completada'
+                  AND t.fecha_vencimiento IS NOT NULL
+                  AND t.fecha_vencimiento <= CURRENT_DATE + INTERVAL '2 days'
+                ORDER BY t.fecha_vencimiento ASC
+            """, (g.user['id_usuario'],))
+            alertas = cur.fetchall()
+        cur.close()
+        conn.close()
+    return dict(current_user=g.user, alertas_vencimiento=alertas)
 
 # ─────────────────────────────────────────────
 #  AUTENTICACIÓN
@@ -1097,25 +1119,27 @@ def crear_usuario():
         return redirect(url_for('nuevo_usuario'))
 
 
-@app.route('/usuarios/<int:id_usuario>/editar', methods=['GET'])
-def editar_usuario(id_usuario):
+@app.route('/perfil/editar', methods=['GET'])
+def editar_perfil():
+    id_usuario = g.user['id_usuario']
     conn = obtener_conexion()
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cur.execute("SELECT * FROM usuario WHERE id_usuario = %s", (id_usuario,))
     usuario = cur.fetchone()
     if not usuario:
-        flash('Usuario no encontrado.', 'warning')
+        flash('Perfil no encontrado.', 'warning')
         cur.close()
         conn.close()
-        return redirect(url_for('listar_usuarios'))
+        return redirect(url_for('perfil'))
     equipos = _get_equipos_select(cur)
     cur.close()
     conn.close()
-    return render_template('usuarios/form.html', usuario=usuario, equipos=equipos, active_tab='usuarios')
+    return render_template('usuarios/form.html', usuario=usuario, equipos=equipos, active_tab='perfil')
 
 
-@app.route('/usuarios/<int:id_usuario>/editar', methods=['POST'])
-def actualizar_usuario(id_usuario):
+@app.route('/perfil/editar', methods=['POST'])
+def actualizar_perfil():
+    id_usuario = g.user['id_usuario']
     nombre = request.form.get('nombre', '').strip()
     email = request.form.get('email', '').strip()
     usuario_val = request.form.get('usuario', '').strip() or None
@@ -1127,7 +1151,7 @@ def actualizar_usuario(id_usuario):
 
     if not all([nombre, email, rol]):
         flash('Nombre, email y rol son obligatorios.', 'danger')
-        return redirect(url_for('editar_usuario', id_usuario=id_usuario))
+        return redirect(url_for('editar_perfil'))
     try:
         conn = obtener_conexion()
         cur = conn.cursor()
@@ -1138,15 +1162,16 @@ def actualizar_usuario(id_usuario):
         conn.commit()
         cur.close()
         conn.close()
-        flash(f'Usuario "{nombre}" actualizado.', 'success')
-        return redirect(url_for('listar_usuarios'))
+        flash(f'Perfil "{nombre}" actualizado.', 'success')
+        return redirect(url_for('perfil'))
     except Exception as e:
-        flash(f'Error al actualizar usuario: {e}', 'danger')
-        return redirect(url_for('editar_usuario', id_usuario=id_usuario))
+        flash(f'Error al actualizar perfil: {e}', 'danger')
+        return redirect(url_for('editar_perfil'))
 
 
-@app.route('/usuarios/<int:id_usuario>/eliminar', methods=['POST'])
-def eliminar_usuario(id_usuario):
+@app.route('/perfil/eliminar', methods=['POST'])
+def eliminar_perfil():
+    id_usuario = g.user['id_usuario']
     try:
         conn = obtener_conexion()
         cur = conn.cursor()
@@ -1154,10 +1179,11 @@ def eliminar_usuario(id_usuario):
         conn.commit()
         cur.close()
         conn.close()
-        flash('Usuario eliminado.', 'success')
+        flash('Cuenta eliminada.', 'success')
+        return redirect(url_for('logout'))
     except Exception as e:
-        flash(f'Error al eliminar: {e}', 'danger')
-    return redirect(url_for('listar_usuarios'))
+        flash(f'Error al eliminar cuenta: {e}', 'danger')
+    return redirect(url_for('perfil'))
 
 
 # ═══════════════════════════════════════════════
@@ -1304,21 +1330,14 @@ def perfil():
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     if request.method == 'POST':
-        recibir_emails = request.form.get('recibir_emails') == 'on'
         alerta_vencimiento = request.form.get('alerta_vencimiento') == 'on'
         try:
             cur.execute("""
-                INSERT INTO config_notificacion (id_usuario, recibir_emails, alerta_vencimiento)
-                VALUES (%s, %s, %s)
-                ON CONFLICT (id_config) DO UPDATE
-                SET recibir_emails = EXCLUDED.recibir_emails, alerta_vencimiento = EXCLUDED.alerta_vencimiento
-            """, (user_id, recibir_emails, alerta_vencimiento))
-            # Fallback simple update if no conflict trigger
-            cur.execute("""
-                UPDATE config_notificacion
-                SET recibir_emails = %s, alerta_vencimiento = %s
-                WHERE id_usuario = %s
-            """, (recibir_emails, alerta_vencimiento, user_id))
+                INSERT INTO config_notificacion (id_usuario, alerta_vencimiento)
+                VALUES (%s, %s)
+                ON CONFLICT (id_usuario) DO UPDATE
+                SET alerta_vencimiento = EXCLUDED.alerta_vencimiento
+            """, (user_id, alerta_vencimiento))
             conn.commit()
             flash('Preferencias de notificación guardadas correctamente.', 'success')
         except Exception as e:
@@ -1327,7 +1346,7 @@ def perfil():
     cur.execute("SELECT * FROM config_notificacion WHERE id_usuario = %s", (user_id,))
     config = cur.fetchone()
     if not config:
-        config = {'recibir_emails': True, 'alerta_vencimiento': True}
+        config = {'alerta_vencimiento': True}
 
     cur.execute("SELECT * FROM usuario WHERE id_usuario = %s", (user_id,))
     usuario_actual = cur.fetchone()

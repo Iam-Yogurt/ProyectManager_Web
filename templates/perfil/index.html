@@ -102,6 +102,14 @@
             </span>
           </div>
         </div>
+        
+        <div class="form-actions" style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+          <a href="{{ url_for('editar_perfil') }}" class="btn btn-ghost btn-sm">✏️ Editar Perfil</a>
+          <form action="{{ url_for('eliminar_perfil') }}" method="POST" style="display:inline;"
+                onsubmit="return confirm('¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.');">
+            <button type="submit" class="btn btn-danger btn-sm">🗑️ Eliminar Cuenta</button>
+          </form>
+        </div>
       </div>
     </div>
 
@@ -112,15 +120,6 @@
       </div>
       <div class="card-body">
         <form action="{{ url_for('perfil') }}" method="POST">
-          <div class="toggle-row">
-            <div class="toggle-label">
-              <strong>Alertas por Correo</strong>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" name="recibir_emails" {% if config.recibir_emails %}checked{% endif %}>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
           <div class="toggle-row">
             <div class="toggle-label">
               <strong>Alertas de Vencimiento</strong>

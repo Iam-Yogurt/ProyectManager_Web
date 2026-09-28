@@ -7,14 +7,14 @@
 <div class="page-header">
   <div class="page-header-left">
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
-      <a href="{{ url_for('listar_usuarios') }}" style="color: var(--c-text-3); font-size: .85rem;">Usuarios</a>
+      <a href="{{ url_for('perfil') if usuario else url_for('listar_usuarios') }}" style="color: var(--c-text-3); font-size: .85rem;">{{ 'Perfil' if usuario else 'Usuarios' }}</a>
       <span style="color: var(--c-text-3);">/</span>
       <span style="font-size: .85rem; color: var(--c-text-2); font-weight: 600;">{{ 'Editar' if usuario else 'Crear' }}</span>
     </div>
-    <h1>{{ 'Editar Usuario' if usuario else 'Registrar Nuevo Usuario' }}</h1>
+    <h1>{{ 'Editar Perfil' if usuario else 'Registrar Nuevo Usuario' }}</h1>
     <p>Configure los datos de acceso, costo por hora y asignación de equipo</p>
   </div>
-  <a href="{{ url_for('listar_usuarios') }}" class="btn btn-ghost btn-sm">⬅️ Volver a Usuarios</a>
+  <a href="{{ url_for('perfil') if usuario else url_for('listar_usuarios') }}" class="btn btn-ghost btn-sm">⬅️ Volver a {{ 'Perfil' if usuario else 'Usuarios' }}</a>
 </div>
 
 <div class="card" style="max-width: 780px; margin: 0 auto;">
@@ -22,7 +22,7 @@
     <div class="card-title">Datos del Recurso</div>
   </div>
   <div class="card-body">
-    <form action="{{ url_for('actualizar_usuario', id_usuario=usuario.id_usuario) if usuario else url_for('crear_usuario') }}" method="POST">
+    <form action="{{ url_for('actualizar_perfil') if usuario else url_for('crear_usuario') }}" method="POST">
       <div class="form-grid">
 
         <div class="form-group">
@@ -89,7 +89,7 @@
       </div>
 
       <div class="form-actions">
-        <a href="{{ url_for('listar_usuarios') }}" class="btn btn-ghost">Cancelar</a>
+        <a href="{{ url_for('perfil') if usuario else url_for('listar_usuarios') }}" class="btn btn-ghost">Cancelar</a>
         <button type="submit" class="btn btn-primary">💾 {{ 'Guardar Cambios' if usuario else 'Registrar Usuario' }}</button>
       </div>
     </form>
