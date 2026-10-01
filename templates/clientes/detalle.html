@@ -1,9 +1,14 @@
 {% extends 'layout.html' %}
 
-{% block title %}{{ cliente.nombre_empresa }} - ProjectFlow ERP{% endblock %}
+{% block title %}{{ cliente.nombre_empresa }} - PROYECT MANAGER {% endblock %}
 {% block page_title %}{{ cliente.nombre_empresa }}{% endblock %}
 
 {% block content %}
+
+<a href="javascript:history.back()" class="btn btn-ghost btn-sm" style="margin-bottom: 12px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+  ← Volver
+</a>
+
 <div class="page-header">
   <div class="page-header-left">
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
@@ -26,7 +31,7 @@
       <div class="card-header">
         <div class="card-title">Proyectos Contratados por el Cliente</div>
       </div>
-      <div class="table-wrap">
+      <div class="table-wrap" style="overflow-x: auto;">
         <table>
           <thead>
             <tr>

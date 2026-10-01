@@ -1,9 +1,14 @@
 {% extends 'layout.html' %}
 
-{% block title %}{{ 'Editar Tarea' if tarea else 'Nueva Tarea' }} - ProjectFlow ERP{% endblock %}
+{% block title %}{{ 'Editar Tarea' if tarea else 'Nueva Tarea' }} - PROYECT MANAGER {% endblock %}
 {% block page_title %}{{ 'Editar Tarea' if tarea else 'Crear Nueva Tarea' }}{% endblock %}
 
 {% block content %}
+
+<a href="javascript:history.back()" class="btn btn-ghost btn-sm" style="margin-bottom: 12px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+  ← Volver
+</a>
+
 <div class="page-header">
   <div class="page-header-left">
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
@@ -14,9 +19,6 @@
     <h1>{{ 'Editar Tarea' if tarea else 'Crear Nueva Tarea' }}</h1>
     <p>Asigne entregables a recursos del equipo y controle tiempos de ejecución</p>
   </div>
-  <a href="{{ url_for('listar_tareas') }}" class="btn btn-ghost btn-sm">
-    ⬅️ Volver a Tareas
-  </a>
 </div>
 
 <div class="card" style="max-width: 860px; margin: 0 auto;">

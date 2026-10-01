@@ -9,7 +9,7 @@ from functools import wraps
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY", "projectflow_erp_secret_key_2026")
+app.secret_key = os.getenv("SECRET_KEY", "proyectmanager_secret_key_2026")
 
 # ─────────────────────────────────────────────
 #  HELPERS & MIDDLEWARE
@@ -413,6 +413,16 @@ def detalle_proyecto(id_proyecto):
         conn.close()
         return redirect(url_for('listar_proyectos'))
 
+    # Equipo de trabajo único asignado al proyecto a través de sus tareas
+    cur.execute("""
+        SELECT DISTINCT u.id_usuario, u.nombre, u.rol, eq.nombre_equipo
+        FROM tarea t
+        JOIN usuario u ON u.id_usuario = t.id_usuario_asignado
+        LEFT JOIN equipo eq ON eq.id_equipo = u.id_equipo
+        WHERE t.id_proyecto = %s
+    """, (id_proyecto,))
+    equipo_proyecto = cur.fetchall()
+
     # Resumen Financiero
     cur.execute("""
         SELECT
@@ -486,6 +496,7 @@ def detalle_proyecto(id_proyecto):
         margen_restante=margen_restante,
         hitos=hitos,
         tareas=tareas,
+        equipo_proyecto=equipo_proyecto,
         active_tab='proyectos'
     )
 
@@ -923,7 +934,7 @@ def listar_equipos():
         SELECT
             u.*,
             eq.nombre_equipo,
-            COALESCE(array_agg(h.nombre_habilidad) FILTER (WHERE h.nombre_habilidad IS NOT NULL), '{}') AS habilidades,
+           COALESCE(array_agg(DISTINCT h.nombre_habilidad) FILTER (WHERE h.nombre_habilidad IS NOT NULL), '{}') AS habilidades,
             COUNT(t.id_tarea) FILTER (WHERE t.estado != 'completada') AS tareas_activas,
             COALESCE(SUM(CASE WHEN t.estado != 'completada' THEN t.tiempo_estimado_horas ELSE 0 END), 0) AS horas_pendientes
         FROM usuario u
@@ -982,7 +993,7 @@ def detalle_equipo(id_equipo):
     cur.execute("""
         SELECT
             u.*,
-            COALESCE(array_agg(h.nombre_habilidad) FILTER (WHERE h.nombre_habilidad IS NOT NULL), '{}') AS habilidades,
+            COALESCE(array_agg(DISTINCT h.nombre_habilidad) FILTER (WHERE h.nombre_habilidad IS NOT NULL), '{}') AS habilidades,
             COUNT(t.id_tarea) FILTER (WHERE t.estado != 'completada') AS tareas_activas,
             COALESCE(SUM(CASE WHEN t.estado != 'completada' THEN t.tiempo_estimado_horas ELSE 0 END), 0) AS horas_pendientes
         FROM usuario u
@@ -1056,6 +1067,36 @@ def eliminar_equipo(id_equipo):
         flash(f'Error al eliminar el equipo: {e}', 'danger')
     return redirect(url_for('listar_equipos'))
 
+@app.route('/asignaciones')
+def matriz_asignaciones():
+    conn = obtener_conexion()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    
+    # Muestra qué usuarios tienen tareas activas en qué proyectos
+    cur.execute("""
+        SELECT 
+            u.id_usuario,
+            u.nombre AS nombre_usuario,
+            u.rol,
+            eq.nombre_equipo,
+            p.id_proyecto,
+            p.nombre_proyecto,
+            p.estado AS estado_proyecto,
+            COUNT(t.id_tarea) AS tareas_en_proceso_o_pendientes
+        FROM usuario u
+        LEFT JOIN equipo eq ON eq.id_equipo = u.id_equipo
+        JOIN tarea t ON t.id_usuario_asignado = u.id_usuario
+        JOIN proyecto p ON p.id_proyecto = t.id_proyecto
+        WHERE t.estado IN ('pendiente', 'en_progreso') AND p.estado NOT IN ('finalizado', 'cancelado')
+        GROUP BY u.id_usuario, u.nombre, u.rol, eq.nombre_equipo, p.id_proyecto, p.nombre_proyecto, p.estado
+        ORDER BY u.nombre ASC
+    """)
+    asignaciones = cur.fetchall()
+    
+    cur.close()
+    conn.close()
+    return render_template('asignaciones/index.html', asignaciones=asignaciones, active_tab='asignaciones')
+
 
 @app.route('/usuarios')
 def listar_usuarios():
@@ -1065,7 +1106,7 @@ def listar_usuarios():
         SELECT
             u.*,
             eq.nombre_equipo,
-            COALESCE(array_agg(h.nombre_habilidad) FILTER (WHERE h.nombre_habilidad IS NOT NULL), '{}') AS habilidades,
+            COALESCE(array_agg(DISTINCT h.nombre_habilidad) FILTER (WHERE h.nombre_habilidad IS NOT NULL), '{}') AS habilidades,
             COUNT(t.id_tarea) FILTER (WHERE t.estado != 'completada') AS tareas_activas,
             COALESCE(SUM(CASE WHEN t.estado != 'completada' THEN t.tiempo_estimado_horas ELSE 0 END), 0) AS horas_pendientes
         FROM usuario u

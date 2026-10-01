@@ -1,9 +1,14 @@
 {% extends 'layout.html' %}
 
-{% block title %}{{ 'Editar Cliente' if cliente else 'Nuevo Cliente' }} - ProjectFlow ERP{% endblock %}
+{% block title %}{{ 'Editar Cliente' if cliente else 'Nuevo Cliente' }} - PROYECT MANAGER {% endblock %}
 {% block page_title %}{{ 'Editar Cliente' if cliente else 'Registrar Cliente' }}{% endblock %}
 
 {% block content %}
+
+<a href="javascript:history.back()" class="btn btn-ghost btn-sm" style="margin-bottom: 12px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+  ← Volver
+</a>
+
 <div class="page-header">
   <div class="page-header-left">
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
@@ -14,7 +19,6 @@
     <h1>{{ 'Editar Cliente' if cliente else 'Registrar Nuevo Cliente' }}</h1>
     <p>Información corporativa y datos de contacto de la cuenta</p>
   </div>
-  <a href="{{ url_for('listar_clientes') }}" class="btn btn-ghost btn-sm">⬅️ Volver a Clientes</a>
 </div>
 
 <div class="card" style="max-width: 780px; margin: 0 auto;">

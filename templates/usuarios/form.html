@@ -34,10 +34,15 @@
 </style>
 {% endblock %}
 
-{% block title %}{{ 'Editar Usuario' if usuario else 'Nuevo Usuario' }} - ProjectFlow ERP{% endblock %}
+{% block title %}{{ 'Editar Usuario' if usuario else 'Nuevo Usuario' }} - PROYECT MANAGER {% endblock %}
 {% block page_title %}{{ 'Editar Usuario' if usuario else 'Registrar Nuevo Usuario' }}{% endblock %}
 
 {% block content %}
+
+<a href="javascript:history.back()" class="btn btn-ghost btn-sm" style="margin-bottom: 12px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+  ← Volver
+</a>
+
 <div class="page-header">
   <div class="page-header-left">
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
@@ -48,7 +53,6 @@
     <h1>{{ 'Editar Perfil' if usuario else 'Registrar Nuevo Usuario' }}</h1>
     <p>Configure los datos de acceso, costo por hora y asignación de equipo</p>
   </div>
-  <a href="{{ url_for('perfil') if usuario else url_for('listar_usuarios') }}" class="btn btn-ghost btn-sm">⬅️ Volver a {{ 'Perfil' if usuario else 'Usuarios' }}</a>
 </div>
 
 <div class="card" style="max-width: 780px; margin: 0 auto;">

@@ -1,9 +1,14 @@
 {% extends 'layout.html' %}
 
-{% block title %}Equipos y Recursos - ProjectFlow ERP{% endblock %}
+{% block title %}Equipos y Recursos - PROYECT MANAGER{% endblock %}
 {% block page_title %}Equipos y Recursos{% endblock %}
 
 {% block content %}
+
+<a href="javascript:history.back()" class="btn btn-ghost btn-sm" style="margin-bottom: 12px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+  ← Volver
+</a>
+
 <div class="page-header">
   <div class="page-header-left">
     <h1>Equipos y Recursos</h1>
@@ -63,7 +68,7 @@
       Directorio de Recursos y Matriz de Habilidades ({{ usuarios|length }})
     </div>
   </div>
-  <div class="table-wrap">
+  <div class="table-wrap" style="overflow-x: auto;">
     <table>
       <thead>
         <tr>

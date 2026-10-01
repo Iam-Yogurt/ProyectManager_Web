@@ -1,9 +1,14 @@
 {% extends 'layout.html' %}
 
-{% block title %}{{ tarea.nombre_tarea }} - ProjectFlow ERP{% endblock %}
+{% block title %}{{ tarea.nombre_tarea }} - PROYECT MANAGER {% endblock %}
 {% block page_title %}{{ tarea.nombre_tarea }}{% endblock %}
 
 {% block content %}
+
+<a href="javascript:history.back()" class="btn btn-ghost btn-sm" style="margin-bottom: 12px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+  ← Volver
+</a>
+
 <div class="page-header">
   <div class="page-header-left">
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">

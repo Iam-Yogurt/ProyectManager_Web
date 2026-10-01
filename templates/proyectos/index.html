@@ -1,9 +1,14 @@
 {% extends 'layout.html' %}
 
-{% block title %}Proyectos e Hitos - ProjectFlow ERP{% endblock %}
+{% block title %}Proyectos e Hitos - PRROYECT MANAGER {% endblock %}
 {% block page_title %}Proyectos e Hitos{% endblock %}
 
 {% block content %}
+
+<a href="javascript:history.back()" class="btn btn-ghost btn-sm" style="margin-bottom: 12px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+  ← Volver
+</a>
+
 <div class="page-header">
   <div class="page-header-left">
     <h1>Gestión de Proyectos</h1>
@@ -32,22 +37,25 @@
 <!-- Stat chips (filtrables) -->
 <div class="stat-chips" id="stat-chips">
   <div class="stat-chip primary active-chip" data-filter="todos" style="cursor:pointer;">
-    <span class="chip-num">{{ proyectos|length }}</span> Proyectos Totales
+    <span class="chip-num" style="color:#ffc516;">{{ proyectos|length }}</span> Proyectos Totales
   </div>
-  <div class="stat-chip" data-filter="planificacion" style="cursor:pointer;background:var(--c-bg-2);border:1.5px solid #a78bfa;color:#7c3aed;">
-    <span class="chip-num" style="color:#7c3aed;">{{ proyectos | selectattr('estado', 'equalto', 'planificacion') | list | length }}</span> Planificación
+  <div class="stat-chip" data-filter="planificacion" style="cursor:pointer;">
+    <span class="chip-num" style="color:#ac7cff;">{{ proyectos | selectattr('estado', 'equalto', 'planificacion') | list | length }}</span> Planificación
   </div>
   <div class="stat-chip warning" data-filter="en_desarrollo" style="cursor:pointer;">
-    <span class="chip-num">{{ proyectos | selectattr('estado', 'equalto', 'en_desarrollo') | list | length }}</span> En Desarrollo
+    <span class="chip-num" style="color:#fb4add;">{{ proyectos | selectattr('estado', 'equalto', 'en_desarrollo') | list | length }}</span> En Desarrollo
   </div>
-  <div class="stat-chip" data-filter="pruebas" style="cursor:pointer;background:var(--c-bg-2);border:1.5px solid #38bdf8;color:#0284c7;">
-    <span class="chip-num" style="color:#0284c7;">{{ proyectos | selectattr('estado', 'equalto', 'pruebas') | list | length }}</span> En Pruebas
+  <div class="stat-chip" data-filter="pruebas" style="cursor:pointer;">
+    <span class="chip-num" style="color:#1cb2fd;">{{ proyectos | selectattr('estado', 'equalto', 'pruebas') | list | length }}</span> En Pruebas
   </div>
   <div class="stat-chip success" data-filter="finalizado" style="cursor:pointer;">
-    <span class="chip-num">{{ proyectos | selectattr('estado', 'equalto', 'finalizado') | list | length }}</span> Finalizados
+    <span class="chip-num" style="color:#09bc2a;">{{ proyectos | selectattr('estado', 'equalto', 'finalizado') | list | length }}</span> Finalizados
   </div>
   <div class="stat-chip danger" data-filter="riesgo" style="cursor:pointer;">
-    <span class="chip-num">{{ proyectos | selectattr('es_riesgo', 'equalto', True) | list | length }}</span> En Riesgo
+    <span class="chip-num" style="color:#ff6f0e;">{{ proyectos | selectattr('es_riesgo', 'equalto', True) | list | length }}</span> En Riesgo
+  </div>
+  <div class="stat-chip" data-filter="cancelado" style="cursor:pointer;">
+    <span class="chip-num" style="color:#ff0404;">{{ proyectos | selectattr('estado', 'equalto', 'cancelado') | list | length }}</span> Cancelados
   </div>
 </div>
 
@@ -146,7 +154,7 @@
 {% else %}
 <!-- ══ LIST VIEW ════════════════════════════════════════ -->
 <div class="card">
-  <div class="table-wrap">
+  <div class="table-wrap" style="overflow-x: auto;">
     <table>
       <thead>
         <tr>

@@ -1,9 +1,14 @@
 {% extends 'layout.html' %}
 
-{% block title %}Clientes - ProjectFlow ERP{% endblock %}
+{% block title %}Clientes - PROYECT MANAGER{% endblock %}
 {% block page_title %}Clientes{% endblock %}
 
 {% block content %}
+
+<a href="javascript:history.back()" class="btn btn-ghost btn-sm" style="margin-bottom: 12px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+  ← Volver
+</a>
+
 <div class="page-header">
   <div class="page-header-left">
     <h1>Gestión de Clientes</h1>
@@ -16,7 +21,7 @@
 </div>
 
 <div class="card">
-  <div class="table-wrap">
+  <div class="table-wrap" style="overflow-x: auto;">
     <table>
       <thead>
         <tr>

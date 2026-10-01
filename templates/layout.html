@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}ProjectFlow ERP{% endblock %}</title>
+  <title>{% block title %}PROYECT MANAGER {% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -24,8 +24,7 @@
         </svg>
       </div>
       <div class="sb-logo-text">
-        ProjectFlow
-        <span>ERP</span>
+        PROYECT MANAGER
       </div>
     </div>
 
@@ -64,6 +63,10 @@
         Equipos y Recursos
       </a>
 
+      <a href="{{ url_for('matriz_asignaciones') }}" class="sidebar-item {% if active_tab == 'asignaciones' %}active{% endif %}">
+        <span>Matriz de Asignaciones</span>
+      </a>
+      
       <a href="{{ url_for('listar_usuarios') }}" class="sb-link {% if active_tab == 'usuarios' %}active{% endif %}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
@@ -130,7 +133,7 @@
             <line x1="3" y1="18" x2="21" y2="18"></line>
           </svg>
         </button>
-        <span class="topbar-title">{% block page_title %}ProjectFlow ERP{% endblock %}</span>
+        <span class="topbar-title">{% block page_title %}PROYECT MANAGER{% endblock %}</span>
       </div>
 
       <form class="topbar-search" action="{{ url_for('buscar') }}" method="GET" role="search">

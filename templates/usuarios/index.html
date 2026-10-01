@@ -1,9 +1,14 @@
 {% extends 'layout.html' %}
 
-{% block title %}Directorio de Usuarios - ProjectFlow ERP{% endblock %}
+{% block title %}Directorio de Usuarios - PROYECT MANAGER {% endblock %}
 {% block page_title %}Directorio de Usuarios{% endblock %}
 
 {% block content %}
+
+<a href="javascript:history.back()" class="btn btn-ghost btn-sm" style="margin-bottom: 12px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+  ← Volver
+</a>
+
 <div class="page-header">
   <div class="page-header-left">
     <h1>Directorio de Recursos</h1>
@@ -15,63 +20,61 @@
   </a>
 </div>
 
-<div class="card">
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Email</th>
-          <th>Usuario</th>
-          <th>Rol</th>
-          <th>Equipo</th>
-          <th>Habilidades</th>
-          <th>Costo / Hora</th>
-          <th>Carga Pendiente</th>
-          <th>Estado</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for u in usuarios %}
-        <tr>
-          <td>
-            <div class="avatar-row">
-              <div class="avatar avatar-slate">{{ u.nombre[:2]|upper }}</div>
-              <span class="td-main">{{ u.nombre }}</span>
-            </div>
-          </td>
-          <td><a href="mailto:{{ u.email }}" style="color: var(--c-primary); font-size: .85rem;">{{ u.email }}</a></td>
-          <td><span style="font-size: .85rem; color: var(--c-text-2);">{{ u.usuario or 'N/A' }}</span></td>
-          <td><span class="badge-rol">{{ u.rol|replace('_',' ')|capitalize }}</span></td>
-          <td>{{ u.nombre_equipo or '— Sin equipo' }}</td>
-          <td>
-            <div style="display: flex; flex-wrap: wrap; gap: 4px; max-width: 240px;">
-              {% for h in u.habilidades %}
-                {% if h %}<span class="badge-skill">{{ h }}</span>{% endif %}
-              {% else %}
-                <span style="color: var(--c-text-3); font-size: .75rem;">—</span>
-              {% endfor %}
-            </div>
-          </td>
-          <td style="font-weight: 600;">${{ "%.2f"|format(u.costo_hora) }}/h</td>
-          <td>{{ u.horas_pendientes }}h</td>
-          <td>
-            {% if u.activo %}
-            <span style="display: inline-flex; align-items: center; gap: 5px; font-size: .78rem; color: var(--c-success); font-weight: 600;">
-              <span class="status-dot active"></span> Activo
-            </span>
+<div class="card" style="width: 100%;">
+  <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+    <thead>
+      <tr style="border-bottom: 2px solid var(--c-border); text-align: left; color: var(--c-text-2);">
+        <th style="padding: 10px 8px;">Nombre</th>
+        <th style="padding: 10px 8px;">Email</th>
+        <th style="padding: 10px 8px;">Usuario</th>
+        <th style="padding: 10px 8px;">Rol</th>
+        <th style="padding: 10px 8px;">Equipo</th>
+        <th style="padding: 10px 8px;">Habilidades</th>
+        <th style="padding: 10px 8px;">Costo/h</th>
+        <th style="padding: 10px 8px;">Carga</th>
+        <th style="padding: 10px 8px;">Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in usuarios %}
+      <tr style="border-bottom: 1px solid var(--c-border);">
+        <td style="padding: 8px 6px;">
+          <div class="avatar-row" style="gap: 6px;">
+            <div class="avatar avatar-sm avatar-slate" style="width: 28px; height: 28px; font-size: 0.75rem;">{{ u.nombre[:2]|upper }}</div>
+            <span class="td-main" style="font-weight: 600; font-size: 0.82rem;">{{ u.nombre }}</span>
+          </div>
+        </td>
+        <td style="padding: 8px 6px;"><a href="mailto:{{ u.email }}" style="color: var(--c-primary);">{{ u.email }}</a></td>
+        <td style="padding: 8px 6px; color: var(--c-text-2);">{{ u.usuario or 'N/A' }}</td>
+        <td style="padding: 8px 6px;"><span class="badge-rol" style="font-size: 0.75rem; padding: 2px 6px;">{{ u.rol|replace('_',' ')|capitalize }}</span></td>
+        <td style="padding: 8px 6px;">{{ u.nombre_equipo or '—' }}</td>
+        <td style="padding: 8px 6px;">
+          <div style="display: flex; flex-wrap: wrap; gap: 3px; max-width: 180px;">
+            {% for h in u.habilidades %}
+              {% if h %}<span class="badge-skill" style="font-size: 0.7rem; padding: 1px 4px;">{{ h }}</span>{% endif %}
             {% else %}
-            <span style="display: inline-flex; align-items: center; gap: 5px; font-size: .78rem; color: var(--c-text-3);">
-              <span class="status-dot inactive"></span> Inactivo
-            </span>
-            {% endif %}
-          </td>
-        </tr>
-        {% else %}
-        <tr class="empty-row"><td colspan="9">No hay usuarios registrados.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+              <span style="color: var(--c-text-3); font-size: 0.75rem;">—</span>
+            {% endfor %}
+          </div>
+        </td>
+        <td style="padding: 8px 6px; font-weight: 600;">${{ "%.2f"|format(u.costo_hora) }}</td>
+        <td style="padding: 8px 6px;">{{ u.horas_pendientes }}h</td>
+        <td style="padding: 8px 6px;">
+          {% if u.activo %}
+          <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem; color: var(--c-success); font-weight: 600;">
+            <span class="status-dot active" style="width: 6px; height: 6px;"></span> Activo
+          </span>
+          {% else %}
+          <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem; color: var(--c-text-3);">
+            <span class="status-dot inactive" style="width: 6px; height: 6px;"></span> Inactivo
+          </span>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr class="empty-row"><td colspan="9" style="text-align: center; padding: 24px;">No hay usuarios registrados.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 {% endblock %}

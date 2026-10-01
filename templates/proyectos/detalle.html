@@ -1,9 +1,14 @@
 {% extends 'layout.html' %}
 
-{% block title %}{{ proyecto.nombre_proyecto }} - ProjectFlow ERP{% endblock %}
+{% block title %}{{ proyecto.nombre_proyecto }} - PROYECT MANAGER{% endblock %}
 {% block page_title %}{{ proyecto.nombre_proyecto }}{% endblock %}
 
 {% block content %}
+
+<a href="javascript:history.back()" class="btn btn-ghost btn-sm" style="margin-bottom: 12px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+  ← Volver
+</a>
+
 <div class="page-header">
   <div class="page-header-left">
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
@@ -179,7 +184,7 @@
         </a>
       </div>
 
-      <div class="table-wrap">
+      <div class="table-wrap" style="overflow-x: auto;">
         <table>
           <thead>
             <tr>
@@ -317,8 +322,30 @@
         </div>
       </div>
     </div>
+<!-- EQUIPO ASIGNADO AL PROYECTO -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Equipo Asignado al Proyecto</div>
+      </div>
+      <div class="card-body">
+        {% if equipo_proyecto %}
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            {% for miembro in equipo_proyecto %}
+              <div style="background: var(--c-bg); border: 1px solid var(--c-border-l); padding: 10px 12px; border-radius: var(--r-sm);">
+                <strong style="color: var(--c-text); font-size: 0.9rem;">{{ miembro.nombre }}</strong>
+                <div style="font-size: 0.8rem; color: var(--c-text-2); text-transform: capitalize; margin-top: 2px;">
+                  {{ miembro.rol }} · <span style="font-weight: 500; color: var(--c-primary);">{{ miembro.nombre_equipo or 'Sin Equipo' }}</span>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p style="color: var(--c-text-3); font-size: 0.85rem; text-align: center; padding: 10px 0;">No hay miembros con tareas asignadas en este proyecto todavía.</p>
+        {% endif %}
+      </div>
+    </div>
 
-  </div>
+  </div> <!-- Cierre de la columna derecha -->
 
-</div>
+</div> <!-- Cierre del detail-layout -->
 {% endblock %}

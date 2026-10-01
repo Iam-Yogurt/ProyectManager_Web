@@ -1,9 +1,14 @@
 {% extends 'layout.html' %}
 
-{% block title %}{{ 'Editar Proyecto' if proyecto else 'Nuevo Proyecto' }} - ProjectFlow ERP{% endblock %}
+{% block title %}{{ 'Editar Proyecto' if proyecto else 'Nuevo Proyecto' }} - PROYECT MANAGER{% endblock %}
 {% block page_title %}{{ 'Editar Proyecto' if proyecto else 'Crear Nuevo Proyecto' }}{% endblock %}
 
 {% block content %}
+
+<a href="javascript:history.back()" class="btn btn-ghost btn-sm" style="margin-bottom: 12px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+  ← Volver
+</a>
+
 <div class="page-header">
   <div class="page-header-left">
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
@@ -14,9 +19,6 @@
     <h1>{{ 'Editar Proyecto' if proyecto else 'Nuevo Proyecto' }}</h1>
     <p>Complete la información para registrar y dar seguimiento al entregable</p>
   </div>
-  <a href="{{ url_for('listar_proyectos') }}" class="btn btn-ghost btn-sm">
-    ⬅️ Volver a Proyectos
-  </a>
 </div>
 
 <div class="card" style="max-width: 860px; margin: 0 auto;">

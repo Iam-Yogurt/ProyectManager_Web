@@ -1,8 +1,13 @@
 {% extends 'layout.html' %}
-{% block title %}Búsqueda: {{ q }} - ProjectFlow ERP{% endblock %}
+{% block title %}Búsqueda: {{ q }} - PROYECT MANAGER{% endblock %}
 {% block page_title %}Búsqueda{% endblock %}
 
 {% block content %}
+
+<a href="javascript:history.back()" class="btn btn-ghost btn-sm" style="margin-bottom: 12px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+  ← Volver
+</a>
+
 <div class="page-header">
   <div class="page-header-left">
     <h1>Resultados de búsqueda</h1>
@@ -32,7 +37,7 @@
   </h2>
 </div>
 <div class="card" style="margin-bottom:20px;">
-  <div class="table-wrap">
+  <div class="table-wrap" style="overflow-x: auto;">
     <table>
       <thead>
         <tr><th>Proyecto</th><th>Cliente</th><th>Estado</th><th></th></tr>
@@ -65,7 +70,7 @@
   </h2>
 </div>
 <div class="card" style="margin-bottom:20px;">
-  <div class="table-wrap">
+  <div class="table-wrap" style="overflow-x: auto;">
     <table>
       <thead>
         <tr><th>Tarea</th><th>Proyecto</th><th>Estado</th><th>Prioridad</th><th></th></tr>
@@ -98,7 +103,7 @@
   </h2>
 </div>
 <div class="card">
-  <div class="table-wrap">
+  <div class="table-wrap" style="overflow-x: auto;">
     <table>
       <thead>
         <tr><th>Nombre</th><th>Email</th><th>Rol</th><th></th></tr>

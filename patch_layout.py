@@ -18,7 +18,7 @@ topbar_html = """    <!-- Topbar -->
             <line x1="3" y1="18" x2="21" y2="18"></line>
           </svg>
         </button>
-        <span class="topbar-title">{% block page_title %}ProjectFlow ERP{% endblock %}</span>
+        <span class="topbar-title">{% block page_title %}PROYECT MANAGER{% endblock %}</span>
       </div>
 
       <form class="topbar-search" action="{{ url_for('buscar') }}" method="GET" role="search">

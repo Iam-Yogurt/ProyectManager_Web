@@ -1,9 +1,14 @@
 {% extends 'layout.html' %}
 
-{% block title %}Tablero de Tareas - ProjectFlow ERP{% endblock %}
+{% block title %}Tablero de Tareas - PROYECT MANAGER {% endblock %}
 {% block page_title %}Tablero de Tareas{% endblock %}
 
 {% block content %}
+
+<a href="javascript:history.back()" class="btn btn-ghost btn-sm" style="margin-bottom: 12px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+  ← Volver
+</a>
+
 <div class="page-header">
   <div class="page-header-left">
     <h1>Tablero de Tareas</h1>
@@ -133,7 +138,7 @@
 {% else %}
 <!-- ══ LIST VIEW ═════════════════════════════════════════ -->
 <div class="card">
-  <div class="table-wrap">
+  <div class="table-wrap" style="overflow-x: auto;">
     <table>
       <thead>
         <tr>
